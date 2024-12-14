@@ -1,0 +1,76 @@
+﻿
+@{
+	ViewBag.Title = "Manage Sponsorship";
+	Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+	<style>
+		.example-modal .modal {
+			position: relative;
+			top: auto;
+			bottom: auto;
+			right: auto;
+			left: auto;
+			display: block;
+			z-index: 1;
+		}
+
+		.example-modal .modal {
+			background: transparent !important;
+		}
+
+		.btn-bs-file {
+			position: relative;
+		}
+
+		.btn-bs-file input[type="file"] {
+				position: absolute;
+				top: -9999999;
+				filter: alpha(opacity=0);
+				opacity: 0;
+				width: 0;
+				height: 0;
+				outline: none;
+				cursor: inherit;
+			}
+
+		.form-popups .tabs_titles a.tabss {
+			padding: 0 10px !important;
+		}
+	</style>
+}
+
+<div class="muser">
+	<div class="mhead">
+		<h3>Manage Sponsorship</h3>
+	</div>
+	<div class="tbahead">
+		<div class="tabs_title">
+			<a href="javascript:void(0);" onclick="" class="tab active" data-tab="tab-1">School Collected</a>
+			<a href="javascript:void(0);" onclick="" class="tab" data-tab="tab-1">School Transfer</a>
+			<a href="javascript:void(0);" onclick="" class="tab" data-tab="tab-1">Admin Transfer</a>
+			@*<a href="javascript:void(0);" onclick="Load('Sponsoree')" class="tab" data-tab="tab-1">Sponsoree</a>*@
+		</div>
+	</div>
+
+	<div class="tabs_cover">
+		<div id="tab-1" class="tab-content active">
+			<div class="table_cvr">
+				<table id="dataTable" class="data_table">
+					<thead>
+						<tr>
+							<th width="20%">Name</th>
+							<th width="20%">Phone</th>
+							<th width="25%">Email</th>
+							<th width="10%">Date</th>
+							<th width="10%">Status</th>
+							<th width="15%">Actions</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

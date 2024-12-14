@@ -1,0 +1,103 @@
+﻿@model MyLunchMoney.Models.UserDetailViewModel
+<style>
+    .child-info {
+        color: gray;
+        font-weight: 600;
+    }
+    .child-details {
+        background: #FFFFFF;
+        box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 16%);
+        border-radius: 5px;
+        padding: 15px;
+        display: block;
+        width: 100%;
+    }
+</style>
+<div class="profile">
+    @if (string.IsNullOrEmpty(Model.FullName))
+    {
+        <div class="pro-detailss">
+            <p>No data found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="pro-detailss">
+
+            @if (string.IsNullOrEmpty(Model.ImagePath))
+            {
+                <img src="~/Content/Admin/img/default-user-black.svg" style="width: 149px; height: 154px; border-radius: 100%;">
+            }
+            else
+            {
+                <img src="@Model.ImagePath" style="width: 149px; height: 154px; border-radius: 100%;">
+            }
+            <div class="cvr_detailsss">
+                <div>
+                    <span>Full Name </span>
+                    <p>@Model.FullName</p>
+                </div>
+                <div>
+                    <span>Email</span>
+                    <p>@Model.Email</p>
+                </div>
+                <div>
+                    <span>Phone</span>
+                    <p>@Model.PhoneNumber</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<h4 style="float:none">Child Details</h4>
+@if (Model.ChildDetails != null && Model.ChildDetails.Count() > 0)
+{
+    foreach (var item in Model.ChildDetails)
+    {
+        <div class="child-details" style="margin-top: 10px;">
+            <table style="width: 100%;" border="0">
+                <tr>
+                    <td rowspan=3>
+                        @if (string.IsNullOrEmpty(item.ImagePath))
+                        {
+                            <img src="~/Content/Admin/img/user-1.png" style="width: 70px; height: 70px; border-radius: 100%;">
+                        }
+                        else
+                        {
+                            <img src="@item.ImagePath" style="width: 70px; height: 70px; border-radius: 100%;">
+                        }
+                    </td>
+                    <td>MLM ID</td>
+                    <td class="child-info">@item.MLMID</td>
+                    <td>DOB</td>
+                    <td class="child-info">@item.DOB</td>
+                </tr>
+                <tr>
+                    <td>First Nmae</td>
+                    <td class="child-info">@item.FirstName</td>
+                    <td>School</td>
+                    <td class="child-info">@item.SchoolName</td>
+                </tr>
+                <tr>
+                    <td>Last Nmae</td>
+                    <td class="child-info">@item.LastName</td>
+                    <td>Grade</td>
+                    <td class="child-info">@item.Grade</td>
+                </tr>
+                <tr>
+                    <td class="child-info" style="text-align:center">@item.Balance JA$</td>
+                    <td><input type="button" value="CAFETERIA HISTORY" onclick="Cafteria('@item.StudentId');" /> </td>
+                    <td><input type="button" value="TRANSATIONS" onclick="Transaction('@item.StudentId');" /> </td>
+                    <td>Sponsored</td>
+                    <td class="child-info">@item.IsSponsored</td>
+                </tr>
+            </table>
+        </div>
+    }
+}
+else
+{
+    <div class="pro-detailss">
+        <p>No data found.</p>
+    </div>
+}

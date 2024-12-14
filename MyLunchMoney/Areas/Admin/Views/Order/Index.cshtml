@@ -1,0 +1,295 @@
+﻿@{
+    ViewBag.Title = "Orders";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.Owin;
+@using MyLunchMoney.Services
+@using MyLunchMoney.Infrastructure.EnumType
+@using MyLunchMoney.Helper
+
+@{
+    string role = string.Empty;
+    string proImage = string.Empty;
+
+    if (Request.IsAuthenticated)
+    {
+        var userManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+        var userRoles = userManager.GetRoles(User.Identity.GetUserId());
+        var user = userManager.FindById(User.Identity.GetUserId());
+        if (userRoles != null)
+        {
+            role = userRoles[0];
+        }
+
+        proImage = !string.IsNullOrEmpty(user.ImagePath) ? user.ImagePath : "/Content/Admin/img/user-1.png";
+    }
+}
+
+
+@section Styles
+{
+    <style>
+        .example-modal .modal {
+            position: relative;
+            top: auto;
+            bottom: auto;
+            right: auto;
+            left: auto;
+            display: block;
+            z-index: 1;
+        }
+
+        .example-modal .modal {
+            background: transparent !important;
+        }
+
+        .btn-bs-file {
+            position: relative;
+        }
+
+            .btn-bs-file input[type="file"] {
+                position: absolute;
+                top: -9999999;
+                filter: alpha(opacity=0);
+                opacity: 0;
+                width: 0;
+                height: 0;
+                outline: none;
+                cursor: inherit;
+            }
+    </style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+    <div class="mhead">
+        <h3>Manage Orders</h3>
+        <span onclick="openNav()" id="btn-addschool">Add Transaction</span>
+        <div class="search-container">
+            <form action="/action_page.php">
+                <input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="tbahead">
+        <div class="tabs_title">
+            <a href="javascript:void(0);" onclick="Load('Cafeteria')" class="tab active" data-tab="tab-1">CAFETERIA</a>
+            <a href="javascript:void(0);" onclick="Load('Fees')" class="tab" data-tab="tab-1">FEES</a>
+            @if (role == RoleType.SchoolAdmin.ToString())
+            {
+                <a href="javascript:void(0);" onclick="Load('PreOrder')" class="tab" data-tab="tab-1">PRE-ORDERS</a>
+            }
+        </div>
+
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+            <div class="custom-select">
+                <input type="hidden" id="GradeId" />
+                <input type="hidden" id="SchoolId" />
+                <div class="form-group">
+                    <select name="ddlGrade" id="ddlGrade" class="form-select" onchange="ddlGradeChange()"></select>
+                </div>
+            </div>
+            <div class="custom-select">
+                <input type="hidden" id="ClassName" />
+                <div class="form-group">
+                    <select name="ddlClass" id="ddlClass" onchange="ddlClassChange()" class="form-select"></select>
+                </div>
+            </div>
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th width="20%">MLMID</th>
+                            <th width="20%">Grade</th>
+                            <th width="25%">Date</th>
+                            <th width="10%">Total</th>
+                            <th width="10%">Status</th>
+                            <th width="15%">Reversal</th>
+                        </tr>
+                    </thead>
+                </table>
+                <table id="dataTablepreOrder" class="data_table" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th width="20%">MLMID</th>
+                            <th width="20%">Grade</th>
+                            <th width="10%">Date</th>
+                            <th width="10%">Menu</th>
+                            <th width="10%">Total</th>
+                            <th width="10%">Status</th>
+                            <th width="20%">Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ManageCafeteriaTransaction">
+    <div id="mySidenav" class="sidenav cst_side_navsss">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; Transaction</a>
+        <div class="formcover">
+            <form class="example">
+                @*<input type="text" placeholder="Search.." name="search" id="search_student" />*@
+                 <select class="js-data-example-ajax" id="ddlMLMIDSearch" placeholder="Search.." style="width:100%;"></select>
+                @*<img class="search-icon" src="~/Content/Admin/img/searchs.png" onclick="GetTransactionHistory($('#search_student').val())" />*@
+            </form>
+        </div>
+        <div class="form-popup">
+            <div id="contentTransactionHistory">
+            </div>
+
+            <div id="item-list-details">
+                <div class="transaction_school_admin">
+                    <div class="trans_table">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                    <th style="width: 60px;">Name</th>
+                                    <th style="width: 60px;"></th>
+                                    <th id="thQuantityDetails" style="width: 60px;">Quantity</th>
+                                    <th style="width: 60px;"></th>
+                                    <th style="width: 60px;" class="text-right">Price</th>
+                                    </thead>
+                                    <tbody class="cart-details">
+                                    </tbody>
+                                    <tfoot>
+                                    <td style="width: 60px;"></td>
+                                    <td style="width: 60px;"></td>
+                                    <td id="tfQuantityDetails" style="width: 60px;"><strong class="cart-details-totalQuantity"></strong></td>
+                                    <td style="width: 60px;"></td>
+                                    <td style="width: 60px;" class="text-right">Total: <strong>$</strong><strong class="cart-details-total"></strong></td>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="add_btn btn" id="addbtn" onclick="openNavAddItem()">Add Item</button>
+            <button class="checkout_btn btn" onclick="checkoutClick()">Checkout</button>
+
+        </div>
+    </div>
+    <div id="myAddItemNav" class="sidenav cst_side_navsss">
+        <a href="javascript:void(0)" class="closebtn" id="itemdianame" onclick="closeMyAddItem()">&times; Item</a>
+        <div class="formcover">
+            <form class="example">
+                <select class="js-data-example-ajax" id="ddlItemSearch" placeholder="Search by Name, Category" style="width:100%;"></select>
+            </form>
+        </div>
+        <div class="form-popup">
+            <div class="item-list" id="added-item-list">
+                <div class="trans_table">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                <th style="width: 60px;">Name</th>
+                                <th style="width: 60px;"></th>
+                                <th id="thQuantity" style="width: 60px;">Quantity</th>
+                                <th style="width: 60px;"></th>
+                                <th style="width: 60px;" class="text-right">Price</th>
+                                </thead>
+                                <tbody class="cart">
+                                </tbody>
+                                <tfoot>
+                                <td style="width: 60px;"></td>
+                                <td style="width: 60px;"></td>
+                                <td id="tfQuantity" style="width: 60px;"><strong class="cart-totalQuantity"></strong></td>
+                                <td style="width: 60px;"></td>
+                                <td style="width: 60px;" class="text-right">Total: <strong>$</strong><strong class="total"></strong></td>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="add-item" id="additemdetail" onclick="AddItem()">Add Item</button>
+    </div>
+</div>
+<div class="modal fade" id="ModalPIN" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">&times;</span>
+                </button>
+            </div>
+            <form id="add-pin-form" role="form" method="POST" action="">
+                <!--Body-->
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>ENTER PIN</label>
+                        <input type="text" id="txtPIN" name="txtPIN" class="form-control">
+                    </div>
+                </div>
+                <!--Footer-->
+                <div class="modal-footer justify-content-center">
+                    <input type="button" class="btn btn-primary" onclick="CheckPinValidate()" value="OK" />
+                </div>
+            </form>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+
+<div class="modal fade" id="ModalPriOrderPIN" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="white-text">&times;</span>
+                </button>
+            </div>
+            <form id="pre-order-pin-form" role="form" method="POST" action="">
+                <!--Body-->
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>ENTER PIN</label>
+                        <input type="hidden" id="hdnPreOrderId" value="">
+                        <input type="text" id="txtPreOrderPIN" name="txtPreOrderPIN" class="form-control">
+                    </div>
+                </div>
+                <!--Footer-->
+                <div class="modal-footer justify-content-center">
+                    <input type="button" class="btn btn-primary" onclick="CheckPreOrderPinValidate()" value="OK" />
+                </div>
+            </form>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/Scripts/pages/ManageOrders.js?v=@(DateTime.Now.Ticks)"></script>
+    <script src="~/Scripts/pages/ItemCart-localstorage.js?v=@(DateTime.Now.Ticks)"></script>
+}
+

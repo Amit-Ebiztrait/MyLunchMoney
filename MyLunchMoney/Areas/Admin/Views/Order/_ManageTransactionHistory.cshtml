@@ -1,0 +1,92 @@
+﻿@model MyLunchMoney.Models.OrderManageDetailDTO
+<div class="profiles">
+    @if (Model.StudentDetail == null)
+    {
+        <div class="pro-detailss">
+            <p>No data found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="pro-detailss">
+            <input type="hidden" value="@Model.StudentDetail.SchoolId" id="hdnSchoolId" />
+            <input type="hidden" value="@Model.StudentDetail.StudentUserId" id="StudentUserId"/>
+            <input type="hidden" value="@Model.StudentDetail.GradeName" id="GradeName"/>
+            <input type="hidden" value="@Model.StudentDetail.ClassName" id="studentClassName"/>
+            <input type="hidden" value="@Model.StudentDetail.MLMID" id="MLMID"/>
+            @if (string.IsNullOrEmpty(Model.StudentDetail.ImagePath))
+            {
+                <img src="~/Content/Admin/img/trans_user.png">
+            }
+            else
+            {
+                <img src="@Model.StudentDetail.ImagePath" width="146" height="146">
+            }
+            <div class="cvr_detailsss">
+                <div>
+                    <span>Name </span>
+                    <p>@Model.StudentDetail.Name</p>
+                </div>
+
+                <div>
+                    <span>Email</span>
+                    <p>@Model.StudentDetail.Email</p>
+                </div>
+                <div>
+                    <span>Phone</span>
+                    <p>@Model.StudentDetail.PhoneNumber</p>
+                </div>
+                <div>
+                    <span>MLMID</span>
+                    <p>@Model.StudentDetail.MLMID</p>
+                </div>
+                <div class="clr_blue">
+                    <span>Balance</span>
+                    <p>@Model.StudentDetail.Balance$</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@if (Model.LastOrder != null && ViewBag.Type != "Fees")
+{
+    <div class="transaction_school_admin">
+        <div class="trans_detail">
+            <span class="trans_date">Last Transaction - @Model.LastOrder.TransactionHistoryDate</span>
+            <button class="repeat_order" onclick="onClickRepeatOrder('@Model.LastOrder.TransactionHistoryId')">Repeat Order</button>
+        </div>
+        <div class="trans_table">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>&nbsp;</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.LastOrder != null && Model.LastOrder.OrderItems != null && Model.LastOrder.OrderItems.Count > 0)
+                    {
+                        foreach (var item in Model.LastOrder.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.ItemName</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.TotalPrice $</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <thead class="total_head">
+                    <tr>
+                        <th>Total</th>
+                        <th>@Model.LastOrder.NoOfItem</th>
+                        <th>@Model.LastOrder.TotalAmount$</th>
+                    </tr>
+                </thead>
+            </table>
+
+        </div>
+    </div>
+}

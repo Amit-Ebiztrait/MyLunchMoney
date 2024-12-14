@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewBag.Title = "Menu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section Styles
+{
+    <style>
+        .tbahead .tabs_title a.tab {
+            margin: 5px;
+        }
+
+        .mhead {
+            float: left;
+            width: 100%;
+            margin: 25px;
+            margin-left: 0;
+        }
+
+        .tbahead {
+            float: left;
+            width: 100%;
+            margin: 0;
+        }
+
+        .ml-5 {
+            margin-left: -5px
+        }
+    </style>
+}
+<div class="muser">
+    <div class="mhead">
+        <h3>Menu</h3>
+        <span id="btn-addschool" onclick="onClickAddItem()">ADD ITEM</span>
+        
+        <div class="search-container">
+        </div>
+    </div>
+    <div class="tbahead">
+        <div class="tabs_title ml-5">
+            <a href="javascript:void(0);" onclick="Load('Monday')" class="tab active" data-tab="tab-1">Monday</a>
+            <a href="javascript:void(0);" onclick="Load('Tuesday')" class="tab" data-tab="tab-1">Tuesday</a>
+            <a href="javascript:void(0);" onclick="Load('Wednesday')" class="tab" data-tab="tab-1">Wednesday</a>
+            <a href="javascript:void(0);" onclick="Load('Thursday')" class="tab" data-tab="tab-1">Thursday</a>
+            <a href="javascript:void(0);" onclick="Load('Friday')" class="tab" data-tab="tab-1">Friday</a>
+            <a href="javascript:void(0);" onclick="Load('Saturday')" class="tab" data-tab="tab-1">Saturday</a>
+            <a href="javascript:void(0);" onclick="Load('Sunday')" class="tab" data-tab="tab-1">Sunday</a>
+        </div>
+
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+            <div class="custom-select">
+                <div class="form-group">
+                    <select id="ddlCategory" class="form-select" onchange="ChangeTab()" ></select>
+                </div>
+            </div>
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option value="0">Days</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th width="40%">ItemName</th>
+                            <th width="20%">Price</th>
+                            <th width="25%">Category</th>
+                            <th width="15%">Remove</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/Scripts/pages/Menu.js?v=@(DateTime.Now.Ticks)"></script>
+}

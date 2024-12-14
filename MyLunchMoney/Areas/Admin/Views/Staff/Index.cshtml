@@ -1,0 +1,144 @@
+﻿
+@{
+    ViewBag.Title = "Staffs";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+    <style>
+        .example-modal .modal {
+            position: relative;
+            top: auto;
+            bottom: auto;
+            right: auto;
+            left: auto;
+            display: block;
+            z-index: 1;
+        }
+
+        .example-modal .modal {
+            background: transparent !important;
+        }
+
+        .btn-bs-file {
+            position: relative;
+        }
+
+            .btn-bs-file input[type="file"] {
+                position: absolute;
+                top: -9999999;
+                filter: alpha(opacity=0);
+                opacity: 0;
+                width: 0;
+                height: 0;
+                outline: none;
+                cursor: inherit;
+            }
+    </style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+    <div class="mhead">
+        <h3>Manage Staff</h3>
+        <span onclick="openNav()" id="btn-addstaff">Add Staff</span>
+        <div class="search-container">
+            <form action="/action_page.php">
+                <input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="tbahead">
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+
+            <div class="custom-select"> 
+                <select onchange="ChangeTab()" id="ddlStatus">
+                    <option value="2">User Status</option>
+                    <option value="0">Inactive</option>
+                    <option value="1">Active</option>
+                </select>
+            </div>
+
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option selected value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table" style="width:100% !important">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; Staff</a>
+    <div class="form-popup">
+        <form id="add-staff-form" name="add-staff-form" role="form">
+            <input type="hidden" id="Id" />
+            <div class="upbtn">
+                <div class="form-group">
+                    <label class="btn-bs-file btn" for="actual-btn" id="imagePreview">
+                        <input type="file" id="actual-btn" name="avatr" class="form-control" />
+                    </label>
+                </div>
+                <a href="javascript:void(0);" onclick="$('#actual-btn').click()" class="addpic">Add picture</a>
+                <a href="javascript:void(0);" onclick='DeleteImage()' class="removepic">Remove</a>
+            </div>
+            <div class="title">
+                <h3>Staff Detail</h3>
+            </div>
+            <div class="fields">
+                <div class="form-group">
+                    <input type="text" id="FirstName" name="FirstName" placeholder="First Name" maxlength="200" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="LastName" name="LastName" placeholder="Last Name" maxlength="200" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="PhoneNumber" name="PhoneNumber" placeholder="Mobile" maxlength="15" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="Email" name="Email" placeholder="Email" maxlength="1000" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="StaffRoleName" name="StaffRoleName" placeholder="StaffRoleName" maxlength="200" />
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:20px !important;">
+                <input type="submit" value="Submit" class="submit-btn" id="submitForm" onclick="SaveStaff()" />
+                <input type="button" value="Reset" class="reset-btn" id="reset-btn" onclick="ResetStaff()">
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/Scripts/pages/Staffs.js"></script>
+}
+

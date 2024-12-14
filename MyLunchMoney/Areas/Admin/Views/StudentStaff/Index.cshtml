@@ -1,0 +1,340 @@
+﻿
+@{
+    ViewBag.Title = "Manage Students";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+            .slider.round:before {
+                border-radius: 50%;
+            }
+    </style>
+    <style>
+        .example-modal .modal {
+            position: relative;
+            top: auto;
+            bottom: auto;
+            right: auto;
+            left: auto;
+            display: block;
+            z-index: 1;
+        }
+
+        .example-modal .modal {
+            background: transparent !important;
+        }
+
+        .btn-bs-file {
+            position: relative;
+        }
+
+            .btn-bs-file input[type="file"] {
+                position: absolute;
+                top: -9999999;
+                filter: alpha(opacity=0);
+                opacity: 0;
+                width: 0;
+                height: 0;
+                outline: none;
+                cursor: inherit;
+            }
+
+        .newsize {
+            width: 12% !important;
+        }
+
+        .toggle.ios, .toggle-on.ios, .toggle-off.ios {
+            border-radius: 20px;
+        }
+
+            .toggle.ios .toggle-handle {
+                border-radius: 20px;
+            }
+    </style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+    <div class="mhead">
+        <h3>Manage Students</h3>
+        <span onclick="openNav()" id="btn-addstudent">Add Student</span>
+        <div class="search-container">
+            <form action="/action_page.php">
+                <input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="tbahead">
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="Load()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+            <div class="custom-select">
+                <select onchange="ChangeTab()" id="ddlStatus">
+                    <option value="101">User Status</option>
+                    <option value="0">Inactive</option>
+                    <option value="1">Active</option>
+                </select>
+            </div>
+            @*<div class="custom-select" onchange="Load()" id="SchoolId"></div>*@
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option selected value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+            <div class="custom-select">
+                <input type="button" value="Grade" onclick="openGradeNav()" class="submit-btn" />
+            </div>
+        </div>
+    </div>
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th>MLM ID</th>
+                            <th>Name</th>
+                            <th>Total Amount</th>
+                            <th>Grade</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Sponsor</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; Student</a>
+    <div class="form-popup">
+        <form id="add-student-form" name="add-student-form" role="form">
+            <input type="hidden" id="StudentUserId" />
+            <input type="hidden" id="ParentUserId" />
+            <div class="upbtn">
+                <div class="form-group">
+                    <label class="btn-bs-file btn" for="actual-btn" id="imagePreview">
+                        <input type="file" id="actual-btn" name="avatr" class="form-control" />
+                    </label>
+                </div>
+                <a href="javascript:void(0);" onclick="$('#actual-btn').click()" class="addpic">Add picture</a>
+                <a href="javascript:void(0);" onclick='RemoveImage()' class="removepic">Remove</a>
+            </div>
+            <div class="title">
+                <h3>Student Detail</h3>
+            </div>
+            <div class="fields">
+                <div class="form-group">
+                    <input type="hidden" id="Id" name="Id" placeholder="Id" />
+                    <input type="text" id="MLMID" name="MLMID" placeholder="MLMID" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="FirstName" name="FirstName" placeholder="First Name" maxlength="100" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="LastName" name="LastName" placeholder="Last Name" maxlength="100" />
+                </div>
+                <div class="form-group">
+                    <input type="date" id="DateOfBirth" name="DateOfBirth" placeholder="Date" />
+                </div>
+                <div class="form-group">
+                    <select id="GradeId" name="GradeId" class="form-select" onchange="classDropdownList()">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="ClassId" name="ClassId" class="form-select">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="SponsorNeeded" name="SponsorNeeded" placeholder="SponsorNeeded" value="0" class="SponsorNeeded newsize" />
+                    <label>Sponsor Needed</label>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:20px !important;">
+                <input type="submit" value="Submit" class="submit-btn" id="submitForm" onclick="SaveStudent()" />
+                <input type="button" value="Reset" class="reset-btn" id="reset-btn" onclick="ResetForm()">
+                <input type="button" value="TRANSCTION HISTORY" style="width:150px" class="submit-btn" id="Btntransaction" onclick="openTransNav()">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="mystaffSidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeStaffNav()">&times; Student</a>
+    <div class="form-popup">
+        <form id="add-studentStaff-form" name="add-studentStaff-form" role="form">
+            <input type="hidden" id="StudentUserId" />
+            <img src="~/Content/Admin/img/main-pic.png" style="width:130px;height:150px;border-radius: 50%;" id="studImg" />
+            <div style="display:flex; align-items:center; justify-content: space-between;">
+                <h3><b>Balance:<label id="lblbalance"></label></b><label id="lblcurrencytype"></label></h3>
+            </div>
+            <div class="title">
+                <h3>Student Detail</h3>
+            </div>
+            <div class="pro-details">
+                <div>
+                    <input type="hidden" id="Id" name="Id" />
+                    <span>MLM ID</span>
+                    <label id="MLMID" name="MLMID"></label>
+                </div>
+                <div>
+                    <span>First Name</span>
+                    <label id="FirstName" name="FirstName"></label>
+                </div>
+                <div>
+                    <span>Last Name</span>
+                    <label id="LastName" name="LastName"></label>
+                </div>
+                <div>
+                    <span>DateOfBirth</span>
+                    <label id="DateOfBirth" name="DateOfBirth"></label>
+                </div>
+                <div>
+                    <span>Grade Name</span>
+                    <label id="GradeName" name="GradeName"></label>
+                </div>
+                <div>
+                    <span>Class Name</span>
+                    <label id="ClassId" name="ClassId"></label>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:20px !important;">
+                <input type="button" value="TRANSCTION HISTORY" style="width:150px" class="submit-btn" id="Btntransaction" onclick="openTransNav()">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="gradeNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeGradeNav()">&times; Grade</a>
+    <div class="form-popup">
+        <form id="add-grade-form" name="add-grade-form" role="form">
+            <input type="hidden" id="GradeId" />
+            <div class="title">
+                <h3>Grade Detail</h3>
+            </div>
+            <div class="fields" style="grid-template-columns: 100%;">
+                <div class="form-group">
+                    <input type="text" id="GradeName" name="GradeName" placeholder="Grade Name" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="ClassName" name="ClassName" placeholder="Class Name" maxlength="100" />
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:20px !important;">
+                <input type="submit" value="Submit" class="submit-btn" id="submitGradeForm" onclick="SaveGrade()" />
+            </div>
+        </form>
+    </div>
+    <br />
+    <div class="table_cvr">
+        <table id="gradeDataTable" class="data_table" style="width:100% !important">
+            <thead>
+                <tr>
+                    <th>Grade</th>
+                    <th>Class Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div id="transactionNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeTransactionNav()">&times; Transaction</a>
+    <br />
+    <div class="table_cvr">
+        <input type="hidden" id="Id" />
+        <input type="hidden" id="hdnBalanace" />
+        <span id="studentBalance" style="float: right; font-size: large; padding: 15px; color: #0984e3;"></span>
+        <table id="transDataTable" class="data_table" style="width:100% !important">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th class="sum">Amount</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th colspan="4" style="text-align:right">TOTAL AMOUNT:</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/Scripts/pages/StudentStaffs.js"></script>
+}
+

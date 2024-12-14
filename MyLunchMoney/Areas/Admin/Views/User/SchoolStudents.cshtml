@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "Students";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="muser">
+    <div class="mhead">
+        <h3>@TempData["schoolId"].ToString() - Student List</h3>
+        @{
+            TempData.Keep("schoolId");
+        }
+    </div>
+    <div class="tbahead">
+        <div class="right-side">
+            <div class="custom-select">
+                <select onchange="ChangeTab()" id="ddlStatus">
+                    <option value="101">User Status</option>
+                    <option value="0">Inactive</option>
+                    <option value="1">Active</option>
+                </select>
+            </div>
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option selected value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th>MLM ID</th>
+                            <th>Name</th>
+                            <th>Grade</th>
+                            <th>Sponsor</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myStudentSideNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" title="Student Details" onclick="closeStudentNav()">&times; STUDENT</a>
+    <div class="form-popup">
+        <div class="upbtn">
+            <div class="form-group">
+                <label class="btn-bs-file btn" for="actual-btn" id="imagePreview">
+                    <input type="file" id="actual-btn" name="avatar" class="form-control" style="display:none;" />
+                </label>
+            </div>
+            <a href="javascript:void(0);" onclick="$('#actual-btn').click()" style="width:120px;" class="addpic">CHANGE PICTURE</a>
+            <a href="javascript:void(0);" onclick="RemoveImage()" class="removepic">REMOVE</a>
+        </div>
+        <div style="float:right;">
+            <label style="color:red;">BALANCE:&nbsp;</label><label id="lblBalance"></label>
+        </div>
+        <div class="table_cvr" style="margin-top: 25px;">
+            <table class="data_table" style="margin: 0;border-top: 0;">
+                <tbody>
+                    <tr>
+                        <td>MLMID</td>
+                        <td>
+                            <input type="hidden" id="hdnStudentUserId" />
+                            <label id="MLMID" name="MLMID"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>FIRST NAME</td>
+                        <td><label id="FirstName" name="FirstName"></label></td>
+                    </tr>
+                    <tr>
+                        <td>LAST NAME</td>
+                        <td><label id="LastName" name="LastName"></label></td>
+                    </tr>
+                    <tr>
+                        <td>DOB</td>
+                        <td><label id="DateOfBirth" name="DateOfBirth"></label></td>
+                    </tr>
+                    <tr>
+                        <td>GRADE</td>
+                        <td><label id="GradeName" name="GradeName"></label></td>
+                    </tr>
+                    <tr>
+                        <td>PARENTNAME</td>
+                        <td><label id="ParentName" name="ParentName"></label></td>
+                    </tr>
+                    <tr>
+                        <td>SPONSORED</td>
+                        <td><label id="SponsorNeeded" name="SponsorNeeded"></label></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="form-group" style="margin:30px !important;">
+        <input type="button" value="CAFETERIA HISTORY" style="width:150px" class="submit-btn" id="Btntransaction" onclick="openCafteriaNav()">
+        <input type="button" value="TRANSCTION" style="width:150px" class="submit-btn" id="Btntransaction" onclick="openTransNav()">
+    </div>
+</div>
+
+<div id="myStudentTransactionNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNavTabTran()">&times; TRANSACTION</a>
+    <div id="transaction">
+        <div class="tabs_cover">
+            <div id="tab-Transaction-1" class="tab-content active">
+                <div class="table_cvr">
+                    <table id="transactionDatatable" class="data_table" width="100%">
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" style="text-align:right">TOTAL AMOUNT:</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myStudentCafteriaNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNavTabCafteria()">&times; CAFTERIA HISTORY</a>
+    <div id="transaction">
+        <div class="tabs_cover">
+            <div id="tab-Cafteria-1" class="tab-content active">
+                <div class="table_cvr">
+                    <table id="cafetriaDatatable" class="data_table" width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+
+    <script src="~/Scripts/pages/SuperAdminSchoolStudents.js?v=@(DateTime.Now.Ticks)"></script>
+}

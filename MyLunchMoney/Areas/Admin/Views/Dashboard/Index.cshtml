@@ -1,0 +1,671 @@
+﻿@using MyLunchMoney.Models
+@model DashboardDTO
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .imgs_cvr img {
+        border-radius: 9px;
+    }
+
+    .canvasjs-chart-credit {
+        display: none;
+    }
+
+    a.tab.active {
+        border: 2px solid #0984E3;
+        border-radius: 10px;
+    }
+
+    .tabs_school_title {
+        display: grid;
+        grid-template-columns: 33% 33% 33%;
+        grid-gap: 1%;
+        height: 100%;
+        width: 100%;
+        text-align: left;
+    }
+
+        .tabs_school_title .tab {
+            background: #ffffff;
+            box-shadow: 0px 2px 20px rgb(0 0 0 / 7%);
+            border-radius: 5px;
+            text-decoration: none;
+            padding: 10px;
+        }
+
+        .tabs_school_title .price_txt {
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 21px;
+            color: #0984E3;
+            text-align: left;
+        }
+</style>
+<!-- Content Wrapper. Contains page content -->
+<div class="double-grid">
+    <div class="second-part">
+        <div class="two-box">
+            <div class="welcome">
+                @*<h3>Hello, @Model.AccountDetail.Name</h3>
+                <span>Welcome Back!</span>
+                <h2>@Model.AccountDetail.AccountBalance</h2>
+                <p>Account Name: @Model.AccountDetail.AccountName</p>
+                <p>Account Number: @Model.AccountDetail.AccountNumber</p>*@
+
+            </div>
+            <div class="graph">
+                <div id="chartContainer" style="height:160px;"><h4 style="padding-left:100px;padding-top:50px;">Loading...</h4></div>
+            </div>
+        </div>
+        <div class="custom_tabstitle">
+            <div class="tabs_title tabs_click">
+                <a href="javascript:void(0)" class="tab active" data-tab="tab-1" id="parent-data-tab">
+                    <div class="img_coverss">
+                        <img src="~/Content/Admin/img/parent.png" alt="img">
+                    </div>
+                    <div class="textscvr">
+                        <h5 class="cst_h5">Parent</h5>
+                        <span class="price_txt">@Model.ParentAmount</span>
+                    </div>
+                </a>
+                <a href="#" class="tab" data-tab="tab-2">
+                    <div class="img_coverss">
+                        <img src="~/Content/Admin/img/school.png" alt="img">
+                    </div>
+                    <div class="textscvr">
+                        <h5 class="cst_h5">School</h5>
+                        <span class="price_txt">@Model.SchoolAmount</span>
+                    </div>
+                </a>
+                <a href="#" class="tab" data-tab="tab-3">
+                    <div class="img_coverss">
+                        <img src="~/Content/Admin/img/sponser.png" alt="img">
+                    </div>
+                    <div class="textscvr">
+                        <h5 class="cst_h5">Sponser</h5>
+                        <span class="price_txt">@Model.SponsorAmount</span>
+                    </div>
+                </a>
+                <a href="#" class="tab" data-tab="tab-4">
+                    <div class="img_coverss">
+                        <img src="~/Content/Admin/img/refund.png" alt="img">
+                    </div>
+                    <div class="textscvr">
+                        <h5 class="cst_h5">Refund</h5>
+                        <!-- <span class="price_txt">6000 JA$</span> -->
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="send_money">
+            <div class="send_money_title">
+                <h1>Send Money</h1>
+                <div class="grid_img_txt_main">
+
+                    @if (Model.Schools != null)
+                    {
+                        foreach (var school in Model.Schools)
+                        {
+                            <div class="grids_image_txt_cvr tabs_click">
+                                <a href="#" class="tab" data-tab="tab-5" data-schoolId="@school.SchoolId" style="display: inherit;">
+                                    <div class="imgs_cvr">
+                                        @if (string.IsNullOrEmpty(school.SchoolImage))
+                                        {
+                                            <img src="~/Content/Admin/img/im5.png" alt="img" height="60" width="60">
+                                        }
+                                        else
+                                        {
+                                            <img src="@school.SchoolImage" alt="img" height="60" width="60">
+                                        }
+                                    </div>
+                                    <div class="txts_ttl">
+                                        <h2>@school.SchoolName</h2>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <h4>No Records</h4>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="third part">
+        <div id="tab-1" class="tab-content active">
+            <div class="wrapper_main">
+                <div class="title_links">
+                    <h1>Recent Transaction - Parent</h1>
+                    @*<a href="#" class="link_cst">View ALL</a>*@
+                </div>
+                <div class="table_cvr" id="table_cvr">
+                    <table id="dataTablParentRecentTransaction" class="data_table">
+                        <thead>
+                            <tr>
+                                <th>TID</th>
+                                <th>PARENT NAME</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tab-2" class="tab-content">
+            <div class="wrapper_main">
+                <div class="title_links">
+                    <h1>Recent Transaction - School</h1>
+                    @*<a href="#" class="link_cst">View ALL</a>*@
+                </div>
+                <div class="table_cvr" id="table_cvr2">
+                    <table id="dataTablSchoolRecentTransaction" class="data_table">
+                        <thead>
+                            <tr>
+                                <th>TID</th>
+                                <th>SCHOOL NAME</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tab-3" class="tab-content">
+            <div class="wrapper_main">
+                <div class="title_links">
+                    <h1>Recent Transaction - Sponsor</h1>
+                    @*<a href="#" class="link_cst">View ALL</a>*@
+                </div>
+                <div class="table_cvr" id="table_cvr3">
+                    <table id="dataTablSponsorRecentTransaction" class="data_table">
+                        <thead>
+                            <tr>
+                                <th>TID</th>
+                                <th>SPONSOR NAME</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tab-4" class="tab-content">
+            <div class="wrapper_main">
+                <div class="title_links">
+                    <h1>Recent Transaction - Refund</h1>
+                    <a href="#" class="link_cst">View ALL</a>
+                </div>
+                <div class="table_cvr" id="table_cvr4">
+                    <table id="dataTablSchoolRefundRequests" class="data_table">
+                        <thead>
+                            <tr>
+                                <th>TID</th>
+                                <th>Parent Name</th>
+                                <th>SCHOOL NAME</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-5" class="tab-content">
+            <div class="wrapper_main">
+                <div class="title_links">
+                    <h1 id="h1SchoolName">SCHOOL</h1>
+                </div>
+                <div class=" tabs_school_title">
+                    <div class="tab">
+                        <div class="textscvr">
+                            <h5 class="cst_h5">Gross Balance</h5>
+                            <span class="price_txt GrossBalance"></span>
+                        </div>
+                    </div>
+                    <div class="tab">
+                        <div class="textscvr">
+                            <h5 class="cst_h5">Already Transfered</h5>
+                            <span class="price_txt TransferedAmount"></span>
+                        </div>
+                    </div>
+                    <div class="tab">
+                        <div class="textscvr">
+                            <h5 class="cst_h5">Refund Requested</h5>
+                            <span class="price_txt RefundRequested"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class=" tabs_school_title" style="margin-top:10px">
+                    <div class="tab">
+                        <div class="textscvr">
+                            <h5 class="cst_h5">Pending Transfer</h5>
+                            <span class="price_txt PeningTransferedAmount"></span>
+                        </div>
+                    </div>
+
+                    <input type="button" class="submit-btn" style="width:130px;height:70px" value="SEND MONEY" />
+
+                </div>
+                <div class="graph" style="margin-top: 20px;">
+                    <div id="chartSchoolContainer" style="height:160px;"><h4 style="padding-left:100px;padding-top:50px;">Loading...</h4></div>
+                </div>
+                <div class="table_cvr" id="table_cvr3" style="margin-top: 20px;">
+                    <table id="dataTablSchoolTransaction" class="data_table" width="100%">
+                        <thead>
+                            <tr>
+                                <th>TID</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.content-wrapper -->
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //$('#table_cvr').load('/Admin/Dashboard/GetRecentTransactionAsync?type=Parent');
+            parentRecentTransaction();
+            $('.tabs_click .tab').click(function () {
+                var tab_id = $(this).attr('data-tab');
+                $('.tabs_click .tab').removeClass('active');
+                $('.tab-content').removeClass('active');
+                $(this).addClass('active');
+                $("#" + tab_id).addClass('active');
+                if (tab_id == "tab-1")
+                {
+                    parentRecentTransaction();
+                }
+                else if (tab_id == "tab-2")
+                {
+                    schoolRecentTransaction();
+                }
+                else if (tab_id == "tab-3")
+                {
+                    sponsorRecentTransaction();
+                }
+                else if (tab_id == "tab-4") {
+                    schoolAllrefundRequests();
+                }
+                else if (tab_id == "tab-5")
+                {
+                    var schoolid = $(this).attr('data-schoolId');
+                    $.ajax({
+                        url: '/Admin/Dashboard/GetDashboardSchoolDetailAsync?schoolId=' + schoolid,
+                        type: "GET",
+                        cache: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $("#overlay").fadeIn(300);
+                        },
+                        success: function (res) {
+                            var response = res.data;
+                            $(".GrossBalance").html(response.GrossBalance + ' JA$')
+                            $(".PeningTransferedAmount").html(response.PeningTransferedAmount + ' JA$')
+                            $(".RefundRequested").html(response.RefundRequested + ' JA$')
+                            $(".TransferedAmount").html(response.TransferedAmount + ' JA$')
+                        }
+                    }).done(function () {
+                        setTimeout(function () { $("#overlay").fadeOut(300); }, 500);
+                    });
+
+                    chartSchool(schoolid);
+                    schoolAllTransaction(schoolid);
+                    $("#h1SchoolName").html($("a.tab.active").find("h2").html());
+                }
+            });
+        });
+
+        $(function () {
+            let dt;
+            $.getJSON('/Admin/Dashboard/GetMonthlyChartAmount', function (data, textStatus, jqXHR) {
+                dt = data.data;
+            }).done(function () {
+                var chart = new CanvasJS.Chart("chartContainer", {
+                    theme: "light2",
+                    animationEnabled: true,
+                    axisY: {
+                        prefix: "JA$"
+                    },
+
+                    data: [
+                        {
+                            type: "spline",
+                            dataPoints: dt,
+                        }
+                    ]
+                });
+                chart.render();
+            });
+        });
+
+        function chartSchool(schoolId) {
+            let dt;
+            $.getJSON('/Admin/Dashboard/GetMonthlySchoolChartAmount?schoolId=' + schoolId, function (data, textStatus, jqXHR) {
+                dt = data.data;
+            }).done(function () {
+                var chart = new CanvasJS.Chart("chartSchoolContainer", {
+                    theme: "light2",
+                    animationEnabled: true,
+                    axisY: {
+                        prefix: "JA$"
+                    },
+
+                    data: [
+                        {
+                            type: "spline",
+                            dataPoints: dt,
+                        }
+                    ]
+                });
+                chart.render();
+            });
+        }
+        function parentRecentTransaction() {
+            var _url = '/Admin/Dashboard/GetRecentTransactionAsync?type=Parent';
+            var $DataTable = $("#dataTablParentRecentTransaction").dataTable();
+            $DataTable.fnDestroy();
+
+            $DataTable = $('#dataTablParentRecentTransaction').dataTable({
+                "ajax": {
+                    "url": _url,
+                    "type": "GET",
+                    "async": false,
+                    "cache": false,
+                    "datatype": "json"
+                },
+                "scrollX": true,
+                "bLengthChange": false,
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "bLengthChange": true,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                "columns": [
+                    {
+                        "bSortable": false,
+                        "data": "FundTransactionId"
+                    },
+                    {
+                        "bSortable": true,
+                        "render": function (data, type, row) {
+                            var img = (row.ItemImage != undefined && row.ItemImage != null && row.ItemImage != "") ? row.ItemImage : "/Content/Admin/img/default-user-black.svg";
+                            var lbl = '<div class="img_tbl">'
+                                + '<img src="' + img + '" alt="' + row.Name + '" height="50px;" width="50px;" style="border-radius: 50%;" onError="this.onerror=null;this.src=\'' + defaultItemImageUrl + '\'">'
+                                + '<span class="name_user">' + row.Name + '</span></div>';
+
+                            return lbl;
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return parseDateFormat(row.CreatedOn);
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return `${row.Amount} JA$`
+                        }
+                    }
+                ],
+                "language": {
+                    "emptyTable": "<div class='row'><div class='col-md-12'><div class='alert alert-info'><p><strong>No record found.</strong></p> </div></div>"
+                },
+                "destroy": true
+            });
+        }
+
+        function schoolRecentTransaction() {
+            var _url = '/Admin/Dashboard/GetRecentTransactionAsync?type=School';
+            var $dataTable = $("#dataTablSchoolRecentTransaction").dataTable();
+            $dataTable.fnDestroy();
+
+            $dataTable = $('#dataTablSchoolRecentTransaction').dataTable({
+                "ajax": {
+                    "url": _url,
+                    "type": "GET",
+                    "async": false,
+                    "cache": false,
+                    "datatype": "json"
+                },
+                "scrollX": true,
+                "bLengthChange": false,
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "bLengthChange": true,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                "columns": [
+                    {
+                        "bSortable": false,
+                        "data": "FundTransactionId"
+                    },
+                    {
+                        "bSortable": true,
+                        "render": function (data, type, row) {
+                            var img = (row.ItemImage != undefined && row.ItemImage != null && row.ItemImage != "") ? row.ItemImage : "/Content/Admin/img/default-user-black.svg";
+                            var lbl = '<div class="img_tbl">'
+                                + '<img src="' + img + '" alt="' + row.Name + '" height="50px;" width="50px;" style="border-radius: 50%;" onError="this.onerror=null;this.src=\'' + defaultItemImageUrl + '\'">'
+                                + '<span class="name_user">' + row.Name + '</span></div>';
+
+                            return lbl;
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return parseDateFormat(row.CreatedOn);
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return `${row.Amount} JA$`
+                        }
+                    }
+                ],
+                "language": {
+                    "emptyTable": "<div class='row'><div class='col-md-12'><div class='alert alert-info'><p><strong>No record found.</strong></p> </div></div>"
+                },
+                "destroy": true
+            });
+        }
+
+        function sponsorRecentTransaction() {
+            var _url = '/Admin/Dashboard/GetRecentTransactionAsync?type=Sponsor';
+            var $dataTable = $("#dataTablSponsorRecentTransaction").dataTable();
+            $dataTable.fnDestroy();
+
+            $dataTable = $('#dataTablSponsorRecentTransaction').dataTable({
+                "ajax": {
+                    "url": _url,
+                    "type": "GET",
+                    "async": false,
+                    "cache": false,
+                    "datatype": "json"
+                },
+                "scrollX": true,
+                "bLengthChange": false,
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "bLengthChange": true,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                "columns": [
+                    {
+                        "bSortable": false,
+                        "data": "FundTransactionId"
+                    },
+                    {
+                        "bSortable": true,
+                        "render": function (data, type, row) {
+                            var img = (row.ItemImage != undefined && row.ItemImage != null && row.ItemImage != "") ? row.ItemImage : "/Content/Admin/img/default-user-black.svg";
+                            var lbl = '<div class="img_tbl">'
+                                + '<img src="' + img + '" alt="' + row.Name + '" height="50px;" width="50px;" style="border-radius: 50%;" onError="this.onerror=null;this.src=\'' + defaultItemImageUrl + '\'">'
+                                + '<span class="name_user">' + row.Name + '</span></div>';
+
+                            return lbl;
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return parseDateFormat(row.CreatedOn);
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return `${row.Amount} JA$`
+                        }
+                    }
+                ],
+                "language": {
+                    "emptyTable": "<div class='row'><div class='col-md-12'><div class='alert alert-info'><p><strong>No record found.</strong></p> </div></div>"
+                },
+                "destroy": true
+            });
+        }
+
+        function schoolAllTransaction(schoolId) {
+            var _url = '/Admin/Dashboard/GetAllSchoolTransactions?schoolId=' + schoolId;
+            var $dataTable = $("#dataTablSchoolTransaction").dataTable();
+            $dataTable.fnDestroy();
+
+            $dataTable = $('#dataTablSchoolTransaction').dataTable({
+                "ajax": {
+                    "url": _url,
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "scrollX": true,
+                "bLengthChange": false,
+                "paging": true,
+                "searching": false,
+                "ordering": false,
+                "bLengthChange": false,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                "columns": [
+                    {
+                        "bSortable": false,
+                        "data": "FundTransactionId",
+                        "autoWidth": false,
+                        "width": "100px",
+                        "title": "TID"
+                    },
+                    {
+                        "bSortable": false,
+                        "data": "CreatedOn",
+                        "autoWidth": false,
+                        "width": "100px",
+                        "title": "DATE"
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return `${row.Amount} JA$`
+                        },
+                        "autoWidth": false,
+                        "width": "100px",
+                        "title": "AMOUNT"
+                    }
+                ],
+                "language": {
+                    "emptyTable": "<div class='row'><div class='col-md-12'><div class='alert alert-info'><p><strong>No record found.</strong></p> </div></div>"
+                },
+                "destroy": true
+            });
+        }
+        function schoolAllrefundRequests() {
+           
+            var _url = '/Admin/Dashboard/GetRecentTransactionAsync?type=Refund';
+            var $DataTable = $("#dataTablSchoolRefundRequests").dataTable();
+            $DataTable.fnDestroy();
+
+            $DataTable = $('#dataTablSchoolRefundRequests').dataTable({
+                "ajax": {
+                    "url": _url,
+                    "type": "GET",
+                    "async": false,
+                    "cache": false,
+                    "datatype": "json"
+                },
+                "scrollX": true,
+                "bLengthChange": false,
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "bLengthChange": true,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
+                "columns": [
+                    {
+                        "bSortable": false,
+                        "data": "FundTransactionId"
+                    },
+                    {
+                        "bSortable": true,
+                        "render": function (data, type, row) {
+                            var img = (row.ItemImage != undefined && row.ItemImage != null && row.ItemImage != "") ? row.ItemImage : "/Content/Admin/img/default-user-black.svg";
+                            var lbl = '<div class="img_tbl">'
+                                + '<img src="' + img + '" alt="' + row.Name + '" height="50px;" width="50px;" style="border-radius: 50%;" onError="this.onerror=null;this.src=\'' + defaultItemImageUrl + '\'">'
+                                + '<span class="name_user">' + row.Name + '</span></div>';
+
+                            return lbl;
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "data": "SchoolName"
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return parseDateFormat(row.CreatedOn);
+                        }
+                    },
+                    {
+                        "bSortable": false,
+                        "render": function (data, type, row) {
+                            return `${row.Amount} JA$`
+                        }
+                    }
+                ],
+                "language": {
+                    "emptyTable": "<div class='row'><div class='col-md-12'><div class='alert alert-info'><p><strong>No record found.</strong></p> </div></div>"
+                },
+                "destroy": true
+            });
+        }
+    </script>
+}

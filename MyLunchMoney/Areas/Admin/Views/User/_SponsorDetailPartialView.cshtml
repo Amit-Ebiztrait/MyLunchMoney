@@ -1,0 +1,131 @@
+﻿@model MyLunchMoney.Models.SponsorProfileViewModel
+<style>
+    .child-info {
+        color: gray;
+        font-weight: 600;
+    }
+    .pro-detailss {
+        display: grid;
+        grid-template-columns: 30% 100% !important;
+        align-items: center;
+    }
+    .child-sponsor {
+        background: #FFFFFF;
+        box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 16%);
+        border-radius: 5px;
+        padding: 15px;
+    }
+</style>
+<div class="profile">
+    @if (string.IsNullOrEmpty(Model.FullName))
+    {
+        <div class="pro-detailss">
+            <p>No data found.</p>
+        </div>
+    }
+    else
+    {
+        <div class="pro-detailss">
+
+            @if (string.IsNullOrEmpty(Model.ImagePath))
+            {
+                <img src="~/Content/Admin/img/default-user-black.svg" style="width: 149px; height: 154px; border-radius: 100%;">
+            }
+            else
+            {
+                <img src="@Model.ImagePath" style="width: 149px; height: 154px; border-radius: 100%;">
+            }
+            <div class="cvr_detailsss">
+                <div>
+                    <span>Full Name </span>
+                    <p>@Model.FullName</p>
+                </div>
+                <div>
+                    <span>Email</span>
+                    <p>@Model.Email</p>
+                </div>
+                <div>
+                    <span>Phone</span>
+                    <p>@Model.PnoneNumber</p>
+                </div>
+                <div>
+                    <span>Organization</span>
+                    <p>@Model.OrganizationName</p>
+                </div>
+                <div>
+                    <span>Position At Organization</span>
+                    <p>@Model.PositionAtOrganization</p>
+                </div>
+                <div>
+                    <span>Parish</span>
+                    <p></p>
+                </div>
+                <div>
+                    <span>Descreate Sponsor</span>
+                    @if (Model.IsDescreateSponsor == 0)
+                    {
+                        <p>Yes</p>
+                    }
+                    else
+                    {
+                        <p> No</p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<h4 style="float:none">Child Sponsor</h4>
+@if (Model.ChildDetails != null && Model.ChildDetails.Count() > 0)
+{
+    foreach (var item in Model.ChildDetails)
+    {
+        <div class="child-sponsor" style="margin-top: 10px;">
+            <table style="width: 100%;" border="0">
+                <tr>
+                    <td rowspan=3>
+                        <img src="~/Content/Admin/img/user-1.png" style="width: 70px; height: 70px; border-radius: 100%;">
+                    </td>
+                    <td>MLM ID</td>
+                    <td class="child-info">@item.MLMID</td>
+                    <td>DOB</td>
+                    <td class="child-info">@item.DateOfBirth</td>
+                </tr>
+                <tr>
+                    <td>First Nmae</td>
+                    <td class="child-info">@item.FirstName</td>
+                    <td>School</td>
+                    <td class="child-info">@item.SchoolName</td>
+                </tr>
+                <tr>
+                    <td>Last Nmae</td>
+                    <td class="child-info">@item.LastName</td>
+                    <td>Grade</td>
+                    <td class="child-info">@item.GradeName</td>
+                </tr>
+                <tr>
+                    <td class="child-info" style="text-align:center">@item.Balance JA$</td>
+                    <td><input type="button" value="CAFETERIA HISTORY" onclick="Cafteria('@item.StudentUserId');" /> </td>
+                    <td>&nbsp;</td>
+                    <td>Sponsored</td>
+                    <td class="child-info">
+                        @if (item.IsSponsored == 0)
+                        {
+                            <p>No</p>
+                        }
+                        else
+                        {
+                            <p> Yes</p>
+                        }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+}
+else
+{
+    <div class="pro-detailss">
+        <p>No data found.</p>
+    </div>
+}

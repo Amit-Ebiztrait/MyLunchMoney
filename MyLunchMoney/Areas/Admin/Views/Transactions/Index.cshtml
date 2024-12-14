@@ -1,0 +1,222 @@
+﻿@{
+	ViewBag.Title = "Transactions";
+	Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+	<style>
+		.example-modal .modal {
+			position: relative;
+			top: auto;
+			bottom: auto;
+			right: auto;
+			left: auto;
+			display: block;
+			z-index: 1;
+		}
+
+		.example-modal .modal {
+			background: transparent !important;
+		}
+
+		.btn-bs-file {
+			position: relative;
+		}
+
+			.btn-bs-file input[type="file"] {
+				position: absolute;
+				top: -9999999;
+				filter: alpha(opacity=0);
+				opacity: 0;
+				width: 0;
+				height: 0;
+				outline: none;
+				cursor: inherit;
+			}
+	</style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+	<div class="mhead">
+		<h3>Manage Transaction</h3>
+		<div class="search-container">
+			<form action="/action_page.php">
+				<input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+				<button type="submit"><i class="fa fa-search"></i></button>
+			</form>
+		</div>
+	</div>
+	<div class="tbahead">
+		<div class="tabs_title">
+			<a href="javascript:void(0);" onclick="Load('Parent')" class="tab active" data-tab="tab-1">By Parent</a>
+			<a href="javascript:void(0);" id="Sponsor" onclick="Load('Sponsor')" class="tab" data-tab="tab-2">By Sponsor</a>
+			<a href="javascript:void(0);" id="Reversal" onclick="Load('Reversal')" class="tab" data-tab="tab-3">Reversals</a>
+			<a href="javascript:void(0);" id="Refund" onclick="Load('Refund')" class="tab" data-tab="tab-4">Refunds</a>
+		</div>
+
+		<div class="right-side">
+			<a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+			<a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+
+			<div class="custom-select">
+				<select onchange="ChangeTab()" id="ddlStatus">
+					<option value="2">User Status</option>
+					<option value="0">Inactive</option>
+					<option value="1">Active</option>
+				</select>
+			</div>
+
+			<div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+				<select>
+					<option value="7">Last 7 Days</option>
+					<option value="15">Last 15 Days</option>
+					<option value="30">Last 30 Days</option>
+					<option value="60">Last 60 Days</option>
+					<option value="90">Last 90 Days</option>
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="tabs_cover">
+		<div id="tab-1" class="tab-content active">
+			<div class="table_cvr">
+				<table id="dataTable" class="data_table">
+					<thead>
+						<tr>
+							<th width="10%">Type</th>
+							<th width="15%">TID</th>
+							<th width="15%">Date</th>
+							<th width="15%">Amount</th>
+							<th width="10%">Sender Name</th>
+							<th width="10%">Email</th>
+							<th width="10%">MLM ID</th>
+							<th width="15%">Student Name</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		<div id="tab-2" class="tab-content">
+			<div class="table_cvr">
+				<table id="sponsordataTable" class="data_table">
+					<thead>
+						<tr>
+							<th width="20%">TID</th>
+							<th width="10">Story Name</th>
+							<th width="20%">Date</th>
+							<th width="10%">Amount</th>
+							<th width="20%">Sender Name</th>
+							<th width="10%">Email</th>
+							<th width="10%">Allocate</th>
+
+						</tr>
+					</thead>
+				</table>
+
+			</div>
+		</div>
+		<div id="tab-3" class="tab-content">
+			<div class="table_cvr">
+				<table id="reversalDataTable" class="data_table">
+					<thead>
+						<tr>
+							<th width="20%">TID</th>
+							<th width="20%">Date</th>
+							<th width="20%">Amount</th>
+							<th width="20%">MLM ID</th>
+							<th width="10%">Student Name</th>
+							<th width="10%">Staff Name</th>
+						</tr>
+					</thead>
+				</table>
+
+			</div>
+		</div>
+		<div id="tab-4" class="tab-content">
+			<div class="table_cvr">
+				<table id="refundDataTable" class="data_table">
+					<thead>
+						<tr>
+							<th width="20%">TID</th>
+							<th width="20%">Date</th>
+							<th width="20%">Amount</th>
+							<th width="20%">MLM ID</th>
+							<th width="10%">Student Name</th>
+							<th width="10%">Staff Name</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div id="allocateNav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeAllocateNav()">&times; Allocated</a>
+		<br />
+		<div class="table_cvr">
+			<table id="allocateDataTable" class="data_table" style="width:100% !important">
+				<thead>
+					<tr>
+						<th>MLM ID</th>
+						<th>Student Name</th>
+						<th id="Balance">Amount</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+	<div id="amountNav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeAmountNav()">&times; Allocated</a>
+		<div class="form-popup">
+			<form id="add-amount-form" name="add-amount-form" role="form">
+				<div class="fields" style="grid-template-columns: 100%;">
+					<div class="form-group">
+						<input type="text" id="txtBalance" name="txtBalance" placeholder="Amount" />
+						<input type="hidden" id="hdnStudentUserId" />
+						<input type="hidden" id="hdnTransactionId" />
+						<input type="hidden" id="hdnAmount" />
+					</div>
+				</div>
+				<div class="form-group" style="margin-top:20px !important;">
+					<input type="submit" value="Add Amount" style="width:95px" class="submit-btn" id="submitForm" onclick="SaveAmount()" />
+				</div>
+			</form>
+		</div>
+		<br />
+	</div>
+</div>
+<!-- /.content-wrapper -->
+
+@section Scripts
+{
+	@*<script type="text/javascript">
+		debugger;
+		var idx = document.URL.indexOf('?');
+
+		$(document).ready(function () {
+			getParams();
+		});
+
+		function getParams() {
+			var params = {},
+				pairs = document.URL.split('?')
+					.pop()
+					.split('&');
+
+			for (var i = 0, p; i < pairs.length; i++) {
+				p = pairs[i].split('=');
+				params[p[0]] = p[1];
+			}
+
+			return params;
+		}
+
+		var schoolid = $(this).attr('schoolId');
+	</script>*@
+	<script src="~/Scripts/pages/ManageTransactions.js?v=@(DateTime.Now.Ticks)"></script>
+	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+}

@@ -1,0 +1,194 @@
+﻿
+@{
+	ViewBag.Title = "Items";
+	Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+	<style>
+		.example-modal .modal {
+			position: relative;
+			top: auto;
+			bottom: auto;
+			right: auto;
+			left: auto;
+			display: block;
+			z-index: 1;
+		}
+
+		.example-modal .modal {
+			background: transparent !important;
+		}
+
+		.btn-bs-file {
+			position: relative;
+		}
+
+			.btn-bs-file input[type="file"] {
+				position: absolute;
+				top: -9999999;
+				filter: alpha(opacity=0);
+				opacity: 0;
+				width: 0;
+				height: 0;
+				outline: none;
+				cursor: inherit;
+			}
+            .select2-container--default.select2-container--focus .select2-selection--multiple {
+    border: solid black 1px;
+    outline: 0;
+}
+	</style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+	<div class="mhead">
+		<h3>Manage Items</h3>
+		<span onclick="openNav(0)" id="btn-additem">Add Item</span>
+		<div class="search-container">
+			<form action="/action_page.php">
+				<input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+				<button type="submit"><i class="fa fa-search"></i></button>
+			</form>
+		</div>
+	</div>
+	<div class="tbahead">
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="Load()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+            <div class="custom-select">
+                <div class="form-group">
+                    <select name="CategoryId" id="CategoryId" onchange="Load()"></select>
+                </div>
+            </div>
+
+            <div class="custom-select" onchange="Load()" id="ddlDays">
+                <select>
+                    <option selected value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+
+        </div>
+	</div>
+	<div class="tabs_cover">
+		<div id="tab-1" class="tab-content active">
+			<div class="table_cvr">
+				<table id="dataTable" class="data_table" style="width:100% !important">
+					<thead>
+						<tr>
+							<th>Item Name</th>
+							<th>Price</th>
+							<th>Category</th>
+							<th>Date</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="mySidenav" class="sidenav">
+	<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; Item</a>
+	<div class="form-popup">
+        <form id="add-item-form" name="add-item-form" role="form">
+            <input type="hidden" id="ItemId" />
+            <input type="hidden" id="SchoolId" />
+            <div class="upbtn">
+                <div class="form-group">
+                    <label class="btn-bs-file btn" for="actual-btn" id="imagePreview">
+                        <input type="file" id="actual-btn" name="avatr" class="form-control" />
+                    </label>
+                </div>
+                <a href="javascript:void(0);" onclick="$('#actual-btn').click()" class="addpic">Add picture</a>
+                <a href="javascript:void(0);" onclick='DeleteImage()' class="removepic">Remove</a>
+            </div>
+            <div class="title">
+                <h3>Item Detail</h3>
+            </div>
+            <div class="fields">
+                <div class="form-group">
+                    <input type="text" id="ItemName" name="ItemName" placeholder="Item Name" maxlength="100" oninput="this.value=this.value.replace(/[^A-Za-z0-9 -]/g,'')" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="ItemPrice" name="ItemPrice" placeholder="Item Price" maxlength="5" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                </div>
+                <div class="form-group">
+                    <select class="form-select" id="ddlcurrencytype" name="ddlcurrencytype" disabled>
+                        <option  value="USD">USD</option>
+                        <option selected value="JMD">JMD</option>
+                    </select>
+                </div>
+                <div class="form-group"></div>
+                <div class="form-group">
+                    <select name="ddlCategoryId"  id="ddlCategoryId"></select>
+                    @*<select class="js-example-basic-multiple" name="ddlCategoryId" multiple="multiple" id="ddlCategoryId" style="width:242px;">
+            </select>*@
+                </div>
+
+                <div class="form-group">
+                    <input type="button" value="ADD NEW" onclick="openCategoryNav()" class="submit-btn" />
+                </div>
+
+            </div>
+                <div class="form-group" style="margin-top:20px !important;">
+                    <input type="submit" value="Submit" class="submit-btn" id="submitForm" onclick="SaveItem()" />
+                    <input type="button" value="Reset" class="reset-btn" id="reset-btn" onclick="ResetItem()">
+                </div>
+</form>
+	</div>
+</div>
+
+<div id="categoryNav" class="sidenav">
+	<a href="javascript:void(0)" class="closebtn" onclick="closeCategoryNav()">&times; Category</a>
+	<div class="form-popup">
+		<form id="add-category-form" name="add-category-form" role="form">
+			<input type="hidden" id="CategoryId" />
+			<div class="upbtn">
+				<div class="form-group">
+					<label class="btn-bs-file btn" for="actual-category-btn" id="categoryImagePriview">
+						<input type="file" id="actual-category-btn" name="category_image" class="form-control" />
+					</label>
+				</div>
+				<a href="javascript:void(0);" onclick="$('#actual-category-btn').click()" class="addpic">Add picture</a>
+				<a href="javascript:void(0);" onclick='DeleteCategoryImage()' class="removepic">Remove</a>
+			</div>
+			<div class="title">
+				<h3>Category Detail</h3>
+			</div>
+			<div class="fields" style="grid-template-columns: 100%;">
+				<div class="form-group">
+					<input type="text" id="CategoryName" name="CategoryName" placeholder="Category Name" maxlength="100" oninput="this.value=this.value.replace(/[^A-Za-z0-9 -]/g,'')" />
+				</div>
+			</div>
+			<div class="form-group" style="margin-top:20px !important;">
+				<input type="submit" value="Submit" class="submit-btn" id="submitDetailForm" onclick="SaveCategory()" />
+			</div>
+		</form>
+	</div>
+	<br />
+	<div class="table_cvr">
+		<table id="categoryDataTable" class="data_table" style="width:100% !important">
+			<thead>
+				<tr>
+					<th>Image</th>
+					<th>Category Name</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+
+@section Scripts
+{
+	<script src="~/Scripts/pages/Items.js"></script>
+}
+

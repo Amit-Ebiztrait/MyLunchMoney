@@ -1,0 +1,73 @@
+﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.Owin;
+@using MyLunchMoney.Services
+@using MyLunchMoney.Infrastructure.EnumType
+@using MyLunchMoney.Helper
+
+@{
+    string role = string.Empty;
+    string proImage = string.Empty;
+
+    if (Request.IsAuthenticated)
+    {
+        var userManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+        var userRoles = userManager.GetRoles(User.Identity.GetUserId());
+        var user = userManager.FindById(User.Identity.GetUserId());
+        if (userRoles != null)
+        {
+            role = userRoles[0];
+        }
+
+        proImage = !string.IsNullOrEmpty(user.ImagePath) ? user.ImagePath : "/Content/Admin/img/user-1.png";
+    }
+}
+
+<div class="burger-menu">
+
+    @if (role == RoleType.SuperAdmin.ToString())
+    {
+	<ul>
+		<li class="bluebg" onclick="openMenu()"><img src="~/Content/Admin/img/logo.png" /><span>MiLunchMoney</span></li>
+		<li title="Dashboard" onclick="window.location.href='/Admin/Dashboard'" class="@Html.IsSelected(controller: "Dashboard")"><img src="~/Content/Admin/img/dashboard@2x.png" /><span>Dashboard</span></li>
+		<li title="Users" onclick="window.location.href='/Admin/User'" class="@Html.IsSelected(controller: "User")"><img src="~/Content/Admin/img/profile-user.png" /><span>User</span></li>
+		<li title="Transactions" onclick="window.location.href='/Admin/UserTransaction'" class="@Html.IsSelected(controller: "UserTransaction")"><img src="~/Content/Admin/img/Transactions.png" /><span>Transaction</span></li>
+		<li title="Currency Convert" onclick="window.location.href='/Admin/CurrencyConveter'" class="@Html.IsSelected(controller: "CurrencyConveter")"><img src="~/Content/Admin/img/currency_converter.png" style="width:35px" /><span>Currency Convert</span></li>
+		<li title="Manage Sponsorship" onclick="window.location.href='/Admin/ManageSponsorship'" class="@Html.IsSelected(controller: "ManageSponsorship")"><img src="~/Content/Admin/img/currency_converter.png" style="width:35px" /><span>Manage Sponsorship</span></li>
+	</ul>
+    }
+    else if (role == RoleType.SchoolAdmin.ToString())
+    {
+<ul>
+    <li class="bluebg" onclick="openMenu()"><img src="~/Content/Admin/img/logo.png" /><span>MiLunchMoney</span></li>
+    <li title="Dashboard" onclick="window.location.href='/Admin/Dashboard'" class="@Html.IsSelected(controller: "Dashboard")"><img src="~/Content/Admin/img/home.png" /><span>Dashboard</span></li>
+    <li title="Students" onclick="window.location.href='/Admin/Student'" class="@Html.IsSelected(controller: "Student")"><img src="~/Content/Admin/img/Students.png" /><span>Students</span></li>
+    <li title="Staff" onclick="window.location.href='/Admin/Staff'" class="@Html.IsSelected(controller: "Staff")"><img src="~/Content/Admin/img/Staff.png" /><span>Staff</span></li>
+    <li title="Items" onclick="window.location.href='/Admin/Item'" class="@Html.IsSelected(controller: "Item")"><img src="~/Content/Admin/img/items.png" /><span>Items</span></li>
+    <li title="Orders" onclick="window.location.href='/Admin/Order/Index'" class="@Html.IsSelected(controller: "Order")"><img src="~/Content/Admin/img/Orders.png" /><span>Orders</span></li>
+    <li title="FeeType" onclick="window.location.href='/Admin/FeeType'" class="@Html.IsSelected(controller: "FeeType")"><img src="~/Content/Admin/img/currency_converter.png" /><span>FeeType</span></li>
+    <li title="Transactions" onclick="window.location.href='/Admin/Transactions/Index'" class="@Html.IsSelected(controller: "Transactions")"><img src="~/Content/Admin/img/Transactions.png" /><span>Transaction</span></li>
+    <li title="Story" onclick="window.location.href='/Admin/Story'" class="@Html.IsSelected(controller: "Story")"><img src="~/Content/Admin/img/school_story.png" /><span>School Story</span></li>
+    <li title="Menu" onclick="window.location.href='@Url.Action("Index", "Menu", new { Area = "Admin" })'" class="@Html.IsSelected(controller: "Menu")"><img src="~/Content/Admin/img/Grid.png" /><span>Menu</span></li>
+</ul>
+    }
+    else if (role == RoleType.SchoolStaff.ToString())
+    {
+        <ul>
+            <li class="bluebg" onclick="openMenu()"><img src="~/Content/Admin/img/logo.png" /><span>MiLunchMoney</span></li>
+            <li title="Students" onclick="window.location.href='/Admin/StudentStaff'" class="@Html.IsSelected(controller: "StudentStaff")"><img src="~/Content/Admin/img/Students.png" /><span>Students</span></li>
+            <li title="Items" onclick="window.location.href='/Admin/Item'" class="@Html.IsSelected(controller: "Item")"><img src="~/Content/Admin/img/items.png" /><span>Items</span></li>
+            <li title="FeeType" onclick="window.location.href='/Admin/FeeType'" class="@Html.IsSelected(controller: "FeeType")"><img src="~/Content/Admin/img/currency_converter.png" /><span>FeeType</span></li>
+            <li title="Orders" onclick="window.location.href='/Admin/Order'" class="@Html.IsSelected(controller: "Order")"><img src="~/Content/Admin/img/Orders.png" /><span>Orders</span></li>
+        </ul>
+    }
+
+    <ul class="bottom">
+        <li class="bluebg">
+            <a href="javascript:void(0);" onclick="openNavss()"><img src="@proImage" class="userpic-sidebar" /></a>
+            <span>
+                <a href="javascript:void(0);" onclick="openNavsNoti()"><img src="~/Content/Admin/img/notification.png" /></a>
+                <a href="/Admin/Account/LogOff"><img src="~/Content/Admin/img/logout.png" /></a>
+            </span>
+        </li>
+    </ul>
+</div>

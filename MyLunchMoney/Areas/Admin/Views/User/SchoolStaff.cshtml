@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "Staffs";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="muser">
+    <div class="mhead">
+        <h3>@TempData["schoolIdforStaff"].ToString() - Staff</h3>
+        @{
+            TempData.Keep("schoolIdforStaff");
+        }
+    </div>
+    <div class="tbahead">
+        <div class="right-side">
+            <div class="custom-select">
+                <select onchange="ChangeTab()" id="ddlStatus">
+                    <option value="2">User Status</option>
+                    <option value="0">Inactive</option>
+                    <option value="1">Active</option>
+                </select>
+            </div>
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option selected value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table" style="width:100% !important">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="myStaffSideNav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" title="Staff Details" onclick="closeStaffNav()">&times; STAFF</a>
+    <div class="form-popup">
+        <div class="upbtn">
+            <div class="form-group">
+                <label class="btn-bs-file btn" for="actual-btn" id="imagePreview">
+                    <input type="file" id="actual-btn" name="avatar" class="form-control" style="display:none;" />
+                </label>
+            </div>
+            <a href="javascript:void(0);" onclick="$('#actual-btn').click()" style="width:120px;" class="addpic">CHANGE PICTURE</a>
+            <a href="javascript:void(0);" onclick="RemoveImage()" class="removepic">REMOVE</a>
+        </div>
+        <div class="table_cvr" style="margin-top: 25px;">
+            <table class="data_table" style="margin: 0;border-top: 0;">
+                <tbody>
+                    <tr>
+                        <td>FIRST NAME</td>
+                        <td><label id="FirstName" name="FirstName"></label></td>
+                    </tr>
+                    <tr>
+                        <td>LAST NAME</td>
+                        <td><label id="LastName" name="LastName"></label></td>
+                    </tr>
+                    <tr>
+                        <td>EMAIL</td>
+                        <td><label id="Email" name="Email"></label></td>
+                    </tr>
+                    <tr>
+                        <td>PHONE</td>
+                        <td><label id="PhoneNumber" name="PhoneNumber"></label></td>
+                    </tr>
+                    <tr>
+                        <td>ROLE</td>
+                        <td><label id="StaffRoleName" name="StaffRoleName"></label></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/Scripts/pages/SuperAdminSchoolStaff.js?v=@(DateTime.Now.Ticks)"></script>
+}

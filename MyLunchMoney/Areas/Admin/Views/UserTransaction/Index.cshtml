@@ -1,0 +1,230 @@
+﻿@{
+    ViewBag.Title = "Transactions";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+    <style>
+        .example-modal .modal {
+            position: relative;
+            top: auto;
+            bottom: auto;
+            right: auto;
+            left: auto;
+            display: block;
+            z-index: 1;
+        }
+
+        .example-modal .modal {
+            background: transparent !important;
+        }
+
+        .btn-bs-file {
+            position: relative;
+        }
+
+            .btn-bs-file input[type="file"] {
+                position: absolute;
+                top: -9999999;
+                filter: alpha(opacity=0);
+                opacity: 0;
+                width: 0;
+                height: 0;
+                outline: none;
+                cursor: inherit;
+            }
+        .activess {
+            border-bottom: 3px solid red;
+        }
+    </style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+    <div class="mhead">
+        <h3>Manage Transaction</h3>
+        <div class="search-container">
+            <form action="/action_page.php">
+                <input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="tbahead">
+        <div class="tabs_title">
+            <a href="javascript:void(0);" onclick="Load('Parent')" class="tab active" data-tab="tab-1">Parents</a>
+            <a href="javascript:void(0);" id="Sponsor" onclick="Load('Sponsor')" class="tab" data-tab="tab-2">Sponsers</a>
+            <a href="javascript:void(0);" id="School" onclick="Load('School')" class="tab" data-tab="tab-3">Schools</a>
+            <a href="javascript:void(0);" id="School" onclick="Load('Refund')" class="tab" data-tab="tab-4">Refund</a>
+        </div>
+
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+
+            <div class="custom-select">
+                <select onchange="ChangeTab()" id="ddlStatus">
+                    <option value="2">User Status</option>
+                    <option value="0">Inactive</option>
+                    <option value="1">Active</option>
+                </select>
+            </div>
+
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Id</th>
+                            <th width="20%">Parent Name</th>
+                            <th width="20%">School Name</th>
+                            <th width="10%">Email</th>
+                            <th width="10%">Status</th>
+                            <th width="10%">Date</th>
+                            <th width="20%">Amount</th>
+                            @*  <th width="10%">Type</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div id="tab-2" class="tab-content">
+            <div class="table_cvr">
+                <table id="sponsorDataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Id</th>
+                            <th width="20%">Sponsor Name</th>
+                            <th width="20%">School Name</th>
+                            <th width="10%">Email</th>
+                            <th width="10%">Status</th>
+                            <th width="10%">Date</th>
+                            <th width="20%">Amount</th>
+                            @*  <th width="10%">Type</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div id="tab-3" class="tab-content">
+            <div class="table_cvr">
+                <table id="schoolDataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Id</th>
+                            <th width="20%">School Name</th>
+                            <th width="20%">Email</th>
+                            <th width="10%">Status</th>
+                            <th width="10%">Date</th>
+                            <th width="10%">Amount</th>
+                            <th width="20%">Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <div id="tab-4" class="tab-content active">
+            <div class="table_cvr">
+                <table id="refundDataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Id</th>
+                            <th width="20%">Parent Name</th>
+                            <th width="15%">School Name</th>
+                            <th width="15%">Email</th>
+                            <th width="10%">Status</th>
+                            <th width="10%">Date</th>
+                            <th width="20%">Amount</th>
+                            <th width="20%">Actions</th>
+                            @*  <th width="10%">Type</th>*@
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="mySidenav111" class="sidenav cst_side_navsss">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeTransactionTab()">&times; Transaction</a>
+        <input type="hidden" id="hdnSchoolId" />
+        <div class="form-popups">
+            <div class="custom_tabstitles">
+                <div id="ttls" class="tabs_titles">
+                    <a href="javascript:void(0)" id="SponsorTransaction" class="tabss activess" data-tab="tab-sponsortransDataTable">
+                        By Sponsers
+                    </a>
+                    <a href="javascript:void(0)" id="ParentTransaction" class="tabss" data-tab="tab-parentsDataTable">
+                        By Parents
+                    </a>
+                    @*<a href="#" class="tabss" data-tab="tab-33">
+                            Refunds
+                        </a>*@
+                </div>
+            </div>
+            <div id="tab-sponsortransDataTable" class="tab-contentss">
+                <div class="table_cvr">
+                    <table id="sponsortransDataTable" class="data_table">
+                    </table>
+                </div>
+            </div>
+            <div id="tab-parentsDataTable" class="tab-contentss">
+                <div class="table_cvr">
+                    <table id="parentsDataTable" class="data_table">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; Refunds</a>
+    </div>
+    <div class="modal fade" id="ModalPIN" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <!--Content-->
+            <div class="modal-content">
+                <!--Header-->
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="white-text">&times;</span>
+                    </button>
+                </div>
+                <form id="add-pin-form" role="form" method="POST" action="">
+                    <!--Body-->
+                    <div class="modal-body">
+                        <input type="hidden" id="hdnRefundTransactionId" />
+                        <div class="form-group">
+                            <label>ENTER TRANSACTION REFERENCE NUMBER</label>
+                            <input type="text" id="txtRefNum" name="txtPIN" class="form-control">
+                        </div>
+                    </div>
+                    <!--Footer-->
+                    <div class="modal-footer justify-content-center">
+                        <input type="button" class="btn btn-primary" onclick="confirmPayment()" value="OK" />
+                    </div>
+                </form>
+            </div>
+            <!--/.Content-->
+        </div>
+    </div>
+</div>
+    <!-- /.content-wrapper -->
+
+    @section Scripts
+{
+        <script src="~/Scripts/pages/UserTransactions.js?v=@(DateTime.Now.Ticks)"></script>
+    }
+

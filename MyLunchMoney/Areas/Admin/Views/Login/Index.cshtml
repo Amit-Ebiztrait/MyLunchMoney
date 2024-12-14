@@ -1,0 +1,96 @@
+﻿@using MyLunchMoney.Models
+@model LoginViewModel
+@{
+	ViewBag.Title = "Log in";
+	Layout = null;
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta charset="UTF-8" />
+	<title>Log In | Mi Lunch Money</title>
+	<link href="~/Content/favicon/favicon.png" rel="icon" type="image/png" sizes="32x32" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+	<link href="~/Content/Admin/css/custom.css" rel="stylesheet" />
+	<style>
+		span.field-validation-error.text-danger {
+			float: left;
+			font-size: 12px !important;
+			margin: -5px 0px 10px 5px;
+			width: 100%;
+			text-align: left;
+			color: #dc3545 !important;
+		}
+
+		li {
+			list-style-type: none;
+			text-align: left;
+			color: red;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="login bg">
+        <div class="center-form">
+            <img src="~/Content/Admin/img/login-logo.png" />
+            <h2>Log in to continue...</h2>
+            @using (Html.BeginForm("Index", "Login", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "login", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                if (ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count > 0)
+                {
+                    <div class="alert alert-error bg-danger">
+                        <button type="button" class="close" data-dismiss="alert">×</button>
+                        @Html.ValidationSummary(true)
+                    </div>
+                }
+                if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
+                <input type="text" placeholder="Email Address" id="Email" name="Email" />
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                <div class="pas">
+                    <input id="password-field" type="password" name="password" placeholder="Password" />
+                    <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                </div>
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                <input type="submit" value="Login" />
+                <a href="/Admin/ForgotPassword">Forgot Password</a>
+            }
+            @*<a href="/Home">Not a user? Sign Up</a>*@
+
+        </div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<!-- iCheck -->
+	<script type="text/javascript">
+
+		$(".toggle-password").click(function () {
+
+			$(this).toggleClass("fa-eye fa-eye-slash");
+			var input = $($(this).attr("toggle"));
+			if (input.attr("type") == "password") {
+				input.attr("type", "text");
+			} else {
+				input.attr("type", "password");
+			}
+		});
+
+	</script>
+
+</body>
+</html>

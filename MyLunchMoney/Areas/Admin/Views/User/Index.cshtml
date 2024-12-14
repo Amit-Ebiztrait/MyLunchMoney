@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title = "Users";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+<style>
+    .example-modal .modal{position:relative;top:auto;bottom:auto;right:auto;left:auto;display:block;z-index:1;}
+    .example-modal .modal{background:transparent !important;}
+    .btn-bs-file{position:relative;}
+    .btn-bs-file input[type="file"]{position:absolute;top:-9999999;filter:alpha(opacity=0);opacity:0;width:0;height:0;outline:none;cursor:inherit;}
+    .form-popups .tabs_titles a.tabss{padding:0 10px !important;}
+</style>
+}
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+	<div class="mhead">
+		<h3>Manage User</h3>
+		<span onclick="openNav()" id="btn-addschool">Add School</span>
+		<span onclick="openSponsoreeNav()" id="btn-addsponsoree">Add Sponsoree</span>
+		<div class="search-container">
+			<form action="/action_page.php">
+				<input type="text" placeholder="Search.." name="searchString" id="searchString" onkeyup="SearchString()">
+				<button type="submit"><i class="fa fa-search"></i></button>
+			</form>
+		</div>
+	</div>
+    <div class="tbahead">
+		<div class="tabs_title">
+			<a href="javascript:void(0);" onclick="Load('Parent')" class="tab active" data-tab="tab-1">Parents</a>
+			<a href="javascript:void(0);" onclick="Load('Sponsor')" class="tab" data-tab="tab-1">Sponsers</a>
+			<a href="javascript:void(0);" onclick="Load('School')" class="tab" data-tab="tab-1">Schools</a>
+			<a href="javascript:void(0);" onclick="Load('Sponsoree')" class="tab" data-tab="tab-1">Sponsoree</a>
+		</div>
+
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+
+            <div class="custom-select">
+                <select onchange="ChangeTab()" id="ddlStatus">
+                    <option value="2">User Status</option>
+                    <option value="0">Inactive</option>
+                    <option value="1">Active</option>
+                </select>
+            </div>
+
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="dataTable" class="data_table">
+                    <thead>
+                        <tr>
+                            <th width="20%">Name</th>
+                            <th width="20%">Phone</th>
+                            <th width="25%">Email</th>
+                            <th width="10%">Date</th>
+                            <th width="10%">Status</th>
+                            <th width="15%">Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" title="Add new school" onclick="closeNav()">&times; School</a>
+    <div class="form-popup">
+        <form id="school-form" name="school-form" role="form">
+            <input type="hidden" id="hiddenStateId" />
+            <input type="hidden" id="hiddenSchoolTypeId" />
+            <div class="upbtn">
+                <div class="form-group">
+                    <label class="btn-bs-file btn" for="actual-btn" id="imagePreview">
+                        <input type="file" id="actual-btn" name="avatar" class="form-control" />
+                    </label>
+                </div>
+                <a href="javascript:void(0);" onclick="$('#actual-btn').click()" class="addpic">Add picture</a>
+                <a href="javascript:void(0);" onclick="RemoveImage()" class="removepic">Remove</a>
+            </div>
+            <div class="title">
+                <h3>School Detail</h3>
+            </div>
+            <div class="fields">
+                <div class="form-group">
+                    <input type="text" id="SchoolName" name="SchoolName" placeholder="School Name" maxlength="1000" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="SchoolEmail" name="SchoolEmail" placeholder="School Email" maxlength="1000" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="SchoolPhone" name="SchoolPhone" placeholder="School Phone Number" />
+                </div>
+
+                <div class="form-group drp-state">
+                    <select id="ddlState" name="ddlState" class="form-select">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <select id="ddlSchoolType" name="ddlSchoolType">
+                    </select>
+                </div>
+            </div>
+
+            <div class="title">
+                <h3>Bank Account Details</h3>
+            </div>
+            <div class="fields">
+                <div class="form-group">
+                    <input type="text" id="RecipientName" name="RecipientName" placeholder="Recipient’s Full Name" maxlength="1000" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="RecipientAddress" name="RecipientAddress" placeholder="Recipient’s Address" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="RecipientBankName" name="RecipientBankName" placeholder="Bank Name" maxlength="1000" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="RecipientBranchName" name="RecipientBranchName" placeholder="Branch Name" maxlength="1000" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="RecipientAccountNumber" name="RecipientAccountNumber" placeholder="Account Number" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+                </div>
+
+                <div class="form-group">
+                    <select id="ddlAccountType" name="ddlAccountType">
+                        <option value="">Account Type</option>
+                        <option value="1">Saving</option>
+                        <option value="2">Current</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <input type="text" id="RecipientMobileNumber" name="RecipientMobileNumber" placeholder="Mobile Number" />
+                </div>
+                <div class="form-group">
+                    <input type="text" id="RecipientEmail" name="RecipientEmail" placeholder="Email" />
+                </div>
+                <br />
+            </div>
+            <br />
+            <div class="form-group" style="margin-top:20px !important;">
+                <input type="submit" value="Submit" class="submit-btn" id="submitForm" onclick="SaveSchool()" />
+                <input type="button" value="Reset" class="reset-btn" onclick="ResetForm()">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="mySidenavtab" class="sidenav">
+    <div id="mySidenavtab2">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times; Parent</a>
+        <div class="form-popup">
+            <div id="contentParentChildInfo">
+            </div>
+
+        </div>
+    </div>
+    <div id="parentCafteria">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNavTab()">&times; Cafteria</a>
+        <div class="tabs_cover">
+            <div id="tab-Cafteria-1" class="tab-content active">
+                <div class="table_cvr">
+                    <table id="cafetriaDatatable" class="data_table" width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="transaction">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNavTabTran()">&times; Transaction</a>
+        <div class="tabs_cover">
+            <div id="tab-Transaction-1" class="tab-content active">
+                <div class="table_cvr">
+                    <table id="transactionDatatable" class="data_table" width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="mySideSponsor" class="sidenav">
+    <div id="mySideSponsortab2">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSponsorNav()">&times; Sponsor</a>
+        <div class="form-popup">
+            <div id="contentSponsorChildInfo">
+            </div>
+        </div>
+    </div>
+    <div id="sponsorCafetria">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNavTab()">&times; CAFTERIA HISTORY</a>
+        <div class="tabs_cover">
+            <div id="tab-Sponsor-Cafteria" class="tab-content active">
+                <div class="table_cvr">
+                    <table id="cafetriaSponsorDatatable" class="data_table" width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="mySideSchool" class="sidenav">
+    <div id="mySideschooltab2">
+        <a href="javascript:void(0)" style="padding: 5px; width:auto !important; height: auto !important" class="closebtn" id="lblschool" onclick="closeSchoolNav()">&times; School</a>
+        <div class="form-popups">
+            <div class="custom_tabstitles">
+                <div id="ttls" class="tabs_titles">
+                    <a href="#" class="tabss activess" data-tab="tab-11">
+                        GENERAL
+                    </a>
+                </div>
+            </div>
+            <div id="tab-11" class="tab-contentss activess">
+                <div class="table_general1">
+                    <div class="table_cvr">
+                        <div class="table_general">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="2" style="text-align:center;border:0;"><img style="max-width:100px;" id="schoolLogo" src="~/Content/Admin/img/img_logo.png"></td>
+                                        <td style="font-weight:500;font-size: 14px;line-height: 21px;">
+                                            SCHOOL NAME
+                                        </td>
+                                        <td style="font-weight:400;font-size: 14px;line-height: 21px;">
+                                            <label id="SchoolName" name="SchoolName"></label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:500;font-size: 14px;line-height: 21px;">
+                                            Email
+                                        </td>
+                                        <td style="font-weight:400;font-size: 14px;line-height: 21px;">
+                                            <label id="SchoolEmail" name="SchoolEmail"></label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <table class="data_table">
+                            <tbody>
+                                <tr>
+                                    <td>PHONE</td>
+                                    <td><label id="SchoolPhoneNumber" name="SchoolPhoneNumber"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>TYPE OF SCHOOL</td>
+                                    <td><label id="SchoolType" name="SchoolType"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>PARISH</td>
+                                    <td><label id="Parish" name="Parish"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>ADDRESS</td>
+                                    <td><label id="SchoolAddress" name="SchoolAddress"></label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table_cvr" style="margin-top: 25px;">
+                        <table class="data_table" style="margin: 0;border-top: 0;">
+                            <tbody>
+                                <tr>
+                                    <td>RECIPIENT'S FULL NAME</td>
+                                    <td><label id="RecipientFullName" name="RecipientFullName"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>RECIPIENT'S ADDRESS</td>
+                                    <td><label id="RecipientAddress" name="RecipientAddress"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>BANK NAME</td>
+                                    <td><label id="BankName" name="BankName"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>ACCOUNT TYPE</td>
+                                    <td><label id="AccountType" name="AccountType"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>MOBILE NUMBER</td>
+                                    <td><label id="RecipientMobileNumber" name="RecipientMobileNumber"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>EMAIL</td>
+                                    <td><label id="RecipientEmail" name="RecipientEmail"></label></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- /.content-wrapper -->
+
+@section Scripts
+{
+    <script src="~/Scripts/pages/Users.js?v=@(DateTime.Now.Ticks)"></script>
+}
+

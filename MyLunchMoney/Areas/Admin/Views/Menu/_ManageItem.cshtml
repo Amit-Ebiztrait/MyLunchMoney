@@ -1,0 +1,185 @@
+﻿@{
+    ViewBag.Title = "Menu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="muser">
+    <div class="mhead">
+        <h3 style="display:flex">Add Menu Item - &nbsp;<p id="dayName">@ViewBag.CurrentTab</p></h3>
+        <span onclick="onClickDoneItem()" id="btn-addschool">Done</span>
+        <div class="search-container">
+        </div>
+    </div>
+    <div class="tbahead">
+        <div class="right-side">
+            <a href="javascript:void(0);" onclick="ChangeTab()"><img src="~/Content/Admin/img/refresh.png" /></a>
+            <a href="javascript:void(0);" onclick="ExportPdf()"><img src="~/Content/Admin/img/download.png" /></a>
+            <div class="custom-select">
+                <div class="form-group">
+                    <select id="ddlCategory" class="form-select" onchange="ChangeTab()"></select>
+                </div>
+            </div>
+            <div class="custom-select" onchange="ChangeTab()" id="ddlDays">
+                <select>
+                    <option value="0">Days</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="15">Last 15 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="60">Last 60 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs_cover">
+        <div id="tab-1" class="tab-content active">
+            <div class="table_cvr">
+                <table id="itemlist" class="data_table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;"><input type="checkbox" name="select_all" value="1" id="example-select-all"></th>
+                            <th>Item Name</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/Scripts/pages/Menu.js"></script>
+    <script>
+        let table;
+        $(document).ready(function () {
+            bindItemTable();
+        });
+        function ChangeTab() {
+            $("#overlay").fadeOut(300);
+            fnRebindTable();
+            setTimeout(function () { $("#overlay").fadeOut(300); }, 500);
+        }
+        function fnRebindTable() {
+            table = $("#itemlist").dataTable();
+            table.fnDestroy();
+            bindItemTable();
+        }
+        function bindItemTable() {
+            $("#overlay").fadeIn(300);
+            var cat = $('#ddlCategory option:selected').text();
+            var d = $('#ddlDays option:selected').val();
+
+            var _url = "/Admin/Menu/GetItemsAsync?categoryName=" + cat;
+            var _url = _url + "&days=" + d;
+
+
+            table = $("#itemlist").dataTable({
+                "language": {
+                    "lengthMenu": "Page Size: _MENU_",
+                    "info": "Records _START_ to _END_ of (_TOTAL_)",
+                    "infoEmpty": "NoRecord"
+                },
+                "autoWidth": true,
+                "ajax": {
+                    "url": _url,
+                    "type": "get",
+                    "async": false,
+                    "datatype": "json"
+                },
+                "columnDefs": [
+                    { "width": "10%", "targets": 0 },
+                    { "width": "40%", "targets": 1 },
+                    { "width": "20%", "targets": 2 },
+                    { "width": "30%", "targets": 3 },
+                ],
+                'order': [[1, 'asc']],
+                "columns": [
+                    {
+                        "bSortable": false,
+                        'className': 'dt-body-center',
+                        'render': function (data, type, row) {
+                            return '<input type="checkbox" name="' + row.ItemName + '" value="' + $('<div/>').text(row.ItemId).html() + '">';
+                        }
+                    },
+                    {
+                        "title": "Item Name",
+                        "render": function (data, type, row) {
+                            var img = (row.ItemImage != undefined && row.ItemImage != null && row.ItemImage != "") ? row.ItemImage : "/Content/Admin/img/default-user-black.svg";
+                            var lbl = '<div class="img_tbl">'
+                                + '<img src="' + img + '" alt="' + row.ItemName + '" height="50px;" width="50px;" style="border-radius: 50%;" onError="this.onerror=null;this.src=\'' + defaultItemImageUrl + '\'">'
+                                + '<span class="name_user">' + row.ItemName + '</span></div>';
+
+                            return lbl;
+                        }
+                    },
+                    { "title": "Price", "data": "ItemPrice" },
+                    { "title": "Category", "data": "CategoryName" }
+                ]
+            });
+            setTimeout(function () { $("#overlay").fadeOut(300); }, 500);
+
+            // Handle click on "Select all" control
+            $('#example-select-all').on('click', function () {
+                // Get all rows with search applied
+                var rows = table.api().rows({ 'search': 'applied' }).nodes();
+                // Check/uncheck checkboxes for all rows in the table
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            });
+
+            // Handle click on checkbox to set state of "Select all" control
+            $('#example tbody').on('change', 'input[type="checkbox"]', function () {
+                // If checkbox is not checked
+                if (!this.checked)
+                {
+                    var el = $('#example-select-all').get(0);
+                    // If "Select all" control is checked and has 'indeterminate' property
+                    if (el && el.checked && ('indeterminate' in el))
+                    {
+                        // Set visual state of "Select all" control
+                        // as 'indeterminate'
+                        el.indeterminate = true;
+                    }
+                }
+            });
+
+        }
+        function onClickDoneItem() {
+
+            var payLoad = JSON.stringify({
+                "model": ({
+                    "Day": $("#dayName").html(),
+                    "Items": table.$('input[type="checkbox"]').serializeArray()
+                })
+            });
+            $.ajax({
+                url: "/Admin/Menu/AddTransactionAsync",
+                beforeSend: function () { $("#overlay").fadeIn(300); },
+                type: "POST",
+                data: payLoad,
+                contentType: "application/json; charset=UTF-8",
+                async: false,
+                cache: false,
+                success: function (result) {
+                    if (result.data.code == 400)
+                    {
+                        toastr.error(result.data.message, "Error");
+
+                    }
+                    else if (result.data.code == 200)
+                    {
+                        toastr.success(result.data.message, "Success");
+                        window.location.href = '/Admin/Menu';
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                    setTimeout(function () { $("#overlay").fadeOut(300); }, 500);
+                }
+            }).done(function () {
+                setTimeout(function () { $("#overlay").fadeOut(300); }, 500);
+            });
+        }
+    </script>
+}

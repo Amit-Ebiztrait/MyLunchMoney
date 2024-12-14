@@ -1,0 +1,79 @@
+﻿@model MyLunchMoney.Models.ViewModels.CurrencyViewModel
+@{
+    ViewBag.Title = "Currency Convert";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles
+{
+    <style>
+        .example-modal .modal {
+            position: relative;
+            top: auto;
+            bottom: auto;
+            right: auto;
+            left: auto;
+            display: block;
+            z-index: 1;
+        }
+
+        .example-modal .modal {
+            background: transparent !important;
+        }
+
+        .btn-bs-file {
+            position: relative;
+        }
+
+            .btn-bs-file input[type="file"] {
+                position: absolute;
+                top: -9999999;
+                filter: alpha(opacity=0);
+                opacity: 0;
+                width: 0;
+                height: 0;
+                outline: none;
+                cursor: inherit;
+            }
+
+        .form-currency {
+            background: #FFFFFF;
+            box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 16%);
+            border-radius: 5px;
+            padding: 60px;
+        }
+    </style>
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="muser">
+    <div class="mhead" style="padding: 26px;">
+        <h3>Currency Convert</h3>
+    </div>
+    <form id="add-convert-form" name="add-convert-form" role="form">
+        <input type="hidden" id="Id" value="@Model.Id" />
+        <div class="form-currency">
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label for="inputEmail4">USD</label>
+                    <input class="rate-alerts-signup__currency-input__input form-control" type="text" disabled="" value="1">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="inputPassword4">JMD</label>
+                    @*<input type="text" id="CurrentRate" class="form-control" name="CurrentRate" placeholder="CurrentRate" maxlength="4" />*@
+                    @Html.EditorFor(model => model.CurrentRate, new { htmlAttributes = new {@class = "form-control" , @maxlength = "4" } })
+                </div>
+            </div>
+            <div class="form-group" style="margin-top:20px !important;">
+                <input type="submit" value="Submit" class="submit-btn" id="submitForm" onclick="SaveConvert()" />
+                @*<input type="button" value="Reset" class="reset-btn" id="reset-btn" onclick="ResetConvert()">*@
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts
+{
+    <script src="~/Scripts/pages/CurrencyConvet.js?v=3"></script>
+}
+

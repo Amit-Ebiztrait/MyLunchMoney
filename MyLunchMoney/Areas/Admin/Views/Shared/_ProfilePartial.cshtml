@@ -1,0 +1,175 @@
+﻿<!--profile-->
+@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.Owin;
+@using MyLunchMoney.Services
+@using MyLunchMoney.Infrastructure.EnumType
+@using MyLunchMoney.Helper
+@{
+
+    string userproImage = string.Empty;
+    string role = string.Empty;
+
+    if (Request.IsAuthenticated)
+    {
+        var userManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+        var userRoles = userManager.GetRoles(User.Identity.GetUserId());
+        var user = userManager.FindById(User.Identity.GetUserId());
+        if (userRoles != null)
+        {
+            role = userRoles[0];
+        }
+        userproImage = !string.IsNullOrEmpty(user.ImagePath) ? user.ImagePath : "/Content/Admin/img/profile.png";
+    }
+}
+<style>
+    .profile {
+        background: #FFFFFF;
+        box-shadow: 0px 1px 2px 1px rgb(0 0 0 / 16%);
+        border-radius: 5px;
+        padding: 15px;
+        display: grid;
+        /*grid-template-columns: 30% 70%;*/
+    }
+    button.chang_picture, button.remove {
+        margin-top:5%;
+    }
+</style>
+<div id="mySidenav11" class="sidenav cst_side_navsss">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNavss()">&times; Profile</a>
+    <div class="form-popup">
+        <div class="profile">
+            <img class="imgss usrprofile" src="@userproImage" style="width:150px;height:150px;border-radius: 100%;"/>
+
+            <div class="profile_btn">
+                <input type="file" id="imgupload" style="display:none" />
+                <button id="OpenImgUpload" class="chang_picture">Change Picture</button>
+                <button class="remove" id="button-remove-profilepic" onclick="RemoveUserProfilePicAsync()">Remove</button>
+            </div>
+        </div>
+        <div class="child-details cst_details">
+            @if (role == RoleType.SuperAdmin.ToString() || role == RoleType.SchoolStaff.ToString())
+            {
+                <div>
+                    <h4>First Name</h4>
+                    <h4>Last Name</h4>
+                    <h4>Email</h4>
+                    <h4>Phone</h4>
+                </div>
+                <div class="main_profilee">
+                    <div>
+                        <div class="details ">
+                            <i id="userfname" class="fa fa-pencil editable  textstyle"></i>
+                        </div>
+                        <div class="details">
+                            <i id="userlname" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details">
+                            <i id="useremail" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details">
+                            <i id="usercontact" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details" style="display:none">
+                            <i id="useraddress" class="fa fa-pencil editable textstyle"></i>
+                            <i id="userfullname" class="fa fa-pencil editable  textstyle"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (role == RoleType.SchoolAdmin.ToString())
+            {
+                <div>
+                    <h4>School Name</h4>
+                    <h4>Address</h4>
+                    <h4>Email</h4>
+                    <h4>Phone</h4>
+                </div>
+                <div class="main_profilee">
+                    <div>
+                        <div class="details ">
+                            <i id="userfullname" class="fa fa-pencil editable  textstyle"></i>
+                        </div>
+                        <div class="details">
+                            <i id="useraddress" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details ">
+                            <i id="useremail" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details ">
+                            <i id="usercontact" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details" style="display:none">
+                            <i id="userfname" class="fa fa-pencil editable  textstyle"></i>
+                            <i id="userlname" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (role == RoleType.SchoolStaff.ToString())
+            {
+                <div>
+                    <h4>Name</h4>
+                    <h4>Email</h4>
+                    <h4>Phone</h4>
+                </div>
+                <div class="main_profilee">
+                    <div>
+                        <div class="details ">
+                            <i id="userfullname" class="fa fa-pencil editable  textstyle"></i>
+                        </div>
+                        <div class="details">
+                            <i id="useremail" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                        <div class="details">
+                            <i id="usercontact" class="fa fa-pencil editable textstyle"></i>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="buton_divsss">
+                <button type="button" class="submit_btn" id="change-data-button" onclick="updateuserrecords()">Submit</button>
+            </div>
+        </div>
+        <div class="profile_sec">
+            <h4>Change Password</h4>
+            <form id="changepassword-form" name="changepassword-form">
+                <div class=".parent-psp" id="parent-psp">
+                    <p class="form-group">
+                        <input type="password" name="oldpassword" id="oldpassword" placeholder="Current Password" />
+                        <span toggle="#oldpassword" class="fa fa-fw fa-eye field-icon toggle-password" style="width:20%"></span>
+                    </p>
+                    <p class="form-group">
+                        <input type="password" name="password" id="password" placeholder="New Password" />
+                        <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password" style="width:20%"></span>
+                    </p>
+                    <p class="form-group">
+                        <input type="password" name="confirmpassword" id="confirmpassword" placeholder="Confirm Password" />
+                        @*<span class="eyes"><img src="~/Content/Admin/img/hide-eye.png" alt="img">show</span>*@
+                        <span toggle="#confirmpassword" class="fa fa-fw fa-eye field-icon toggle-password" style="width:20%"></span>
+                    </p>
+                </div>
+                <div class="buton_divsss">
+                    <button type="button" class="submit_btn" id="change-password-button" onclick="ChangePasswordSubmitFrom()">Submit</button>
+                    <button class="reset_btn">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-12 responce-msg">
+
+    </div>
+
+
+</div>
+<div id="mySidenvaNoti" class="sidenav cst_side_navsss">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNavNoti()">&times; Notifications</a>
+    <div class="send_money">
+        <div class="send_money_title">
+            <h1>My Notifications</h1>
+            <div class="notigrid_img_txt_main">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="~/Scripts/pages/profile.js"></script>
